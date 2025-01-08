@@ -1,0 +1,38 @@
+package com.example.outsourcingproject.auth.controller;
+
+import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
+import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
+import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@RestController
+@RequestMapping("")
+public class CustomerAuthController {
+
+    public CustomerAuthController(CustomerAuthServiceImpl customerAuthService) {
+        this.customerAuthService = customerAuthService;
+    }
+
+    private final CustomerAuthServiceImpl customerAuthService;
+
+
+    // 손님 회원가입
+    @PostMapping("/auth/sign-up/customers")
+    public ResponseEntity<SignUpCustomersResponseDto> signUp(
+        @RequestBody SignUpCustomerRequestDto requestDto
+    ) {
+        log.info("gdgdgdg");
+        SignUpCustomersResponseDto responseDto = customerAuthService.signUp(
+            requestDto.getEmail(),
+            requestDto.getPassword()
+        );
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+}
