@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, String>> handlerCustomException(AuthException ex) {
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Map<String, String>> handlerCustomException(CustomException ex) {
         Map<String, String> response = new LinkedHashMap<>();
 
         response.put("errorCode", ex.getErrorCode().getCode());
