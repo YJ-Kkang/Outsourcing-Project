@@ -5,5 +5,7 @@ import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseD
 public interface CustomerAuthService {
     SignUpCustomersResponseDto signUp(String email, String password);
 
+    void signIn(String email, String password);
+
 
 }

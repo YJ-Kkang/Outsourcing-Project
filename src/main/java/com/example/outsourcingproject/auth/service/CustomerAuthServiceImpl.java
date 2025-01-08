@@ -3,6 +3,8 @@ package com.example.outsourcingproject.auth.service;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
 import com.example.outsourcingproject.auth.repository.CustomerAuthRepository;
 import com.example.outsourcingproject.config.PasswordEncoder;
+import com.example.outsourcingproject.config.error.CustomException;
+import com.example.outsourcingproject.config.error.ErrorCode;
 import com.example.outsourcingproject.entity.Customer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,5 +38,19 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         Customer savedCustomer = customerAuthRepository.save(customer);
 
         return new SignUpCustomersResponseDto(savedCustomer);
+    }
+
+    @Override
+    public void signIn(String email, String rawPassword) {
+        // todo 반환
+
+        Customer customer = customerAuthRepository.findByEmail(email).
+            orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+
+        String encodedPassword = customer.getPassword();
+
+        boolean isPasswordMatching = bcrypt.matches(rawPassword, encodedPassword);
+
+        // todo return 손님 토큰
     }
 }

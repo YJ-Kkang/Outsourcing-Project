@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.controller;
 
+import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
@@ -22,17 +23,28 @@ public class CustomerAuthController {
 
     private final CustomerAuthServiceImpl customerAuthService;
 
-
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
     public ResponseEntity<SignUpCustomersResponseDto> signUp(
         @RequestBody SignUpCustomerRequestDto requestDto
     ) {
-        log.info("gdgdgdg");
         SignUpCustomersResponseDto responseDto = customerAuthService.signUp(
             requestDto.getEmail(),
             requestDto.getPassword()
         );
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    // 손님 로그인
+    // todo response 토큰
+    @PostMapping("/auth/sign-in/customers")
+    public ResponseEntity<Void> signIn(
+        @RequestBody SignInCustomerRequestDto requestDto
+    ) {
+        customerAuthService.signIn(
+            requestDto.getEmail(),
+            requestDto.getPassword()
+        );
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
