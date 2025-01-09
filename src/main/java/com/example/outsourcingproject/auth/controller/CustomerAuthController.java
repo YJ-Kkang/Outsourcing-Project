@@ -2,7 +2,7 @@ package com.example.outsourcingproject.auth.controller;
 
 import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
-import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
+import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,10 +25,10 @@ public class CustomerAuthController {
 
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
-    public ResponseEntity<SignUpCustomersResponseDto> signUp(
+    public ResponseEntity<SignUpCustomerResponseDto> signUp(
         @RequestBody SignUpCustomerRequestDto requestDto
     ) {
-        SignUpCustomersResponseDto responseDto = customerAuthService.signUp(
+        SignUpCustomerResponseDto responseDto = customerAuthService.signUp(
             requestDto.getEmail(),
             requestDto.getPassword()
         );

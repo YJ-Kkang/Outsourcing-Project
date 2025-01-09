@@ -4,12 +4,12 @@ import com.example.outsourcingproject.entity.Customer;
 import lombok.Getter;
 
 @Getter
-public class SignUpCustomersResponseDto {
+public class SignUpCustomerResponseDto {
 
     private final Long id;
     private final String email;
 
-    public SignUpCustomersResponseDto(Customer customer) {
+    public SignUpCustomerResponseDto(Customer customer) {
         this.id = customer.getId();
         this.email = customer.getEmail();
     }

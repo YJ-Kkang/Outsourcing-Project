@@ -1,10 +1,10 @@
 package com.example.outsourcingproject.auth.service;
 
-import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
+import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 
 public interface CustomerAuthService {
 
-    SignUpCustomersResponseDto signUp(String email, String password);
+    SignUpCustomerResponseDto signUp(String email, String password);
 
     void signIn(String email, String password);
 

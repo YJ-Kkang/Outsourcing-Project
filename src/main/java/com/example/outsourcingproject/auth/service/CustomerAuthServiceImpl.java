@@ -1,6 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
-import com.example.outsourcingproject.auth.dto.response.SignUpCustomersResponseDto;
+import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.repository.CustomerAuthRepository;
 import com.example.outsourcingproject.utils.PasswordEncoder;
 import com.example.outsourcingproject.exception.CustomException;
@@ -21,7 +21,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
     }
 
     @Override
-    public SignUpCustomersResponseDto signUp(String email, String password) {
+    public SignUpCustomerResponseDto signUp(String email, String password) {
 
         // 등록된 아이디(이메일) 여부 확인
         boolean isExistEmail = customerAuthRepository.findByEmail(email).isPresent();
@@ -34,7 +34,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         Customer savedCustomer = customerAuthRepository.save(customer);
 
         log.info("손님 {} 회원가입 완료", email);
-        return new SignUpCustomersResponseDto(savedCustomer);
+        return new SignUpCustomerResponseDto(savedCustomer);
     }
 
     @Override
