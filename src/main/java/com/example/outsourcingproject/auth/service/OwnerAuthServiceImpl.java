@@ -1,7 +1,9 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
+import com.example.outsourcingproject.utils.JwtUtil;
 import com.example.outsourcingproject.utils.PasswordEncoder;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
@@ -14,10 +16,12 @@ import org.springframework.stereotype.Service;
 public class OwnerAuthServiceImpl implements OwnerAuthService{
 
     private final OwnerAuthRepository ownerAuthRepository;
+    private final JwtUtil jwtUtil;
     PasswordEncoder bcrypt = new PasswordEncoder();
 
-    public OwnerAuthServiceImpl(OwnerAuthRepository ownerAuthRepository) {
+    public OwnerAuthServiceImpl(OwnerAuthRepository ownerAuthRepository, JwtUtil jwtUtil) {
         this.ownerAuthRepository = ownerAuthRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -38,8 +42,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
     }
 
     @Override
-    public void signIn(String email, String rawPassword) {
-        // todo 반환
+    public SignInOwnerResponseDto signIn(String email, String rawPassword) {
 
         Owner owner = ownerAuthRepository.findByEmail(email)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
@@ -52,8 +55,10 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-
         log.info("사장님 {} 로그인 완료", email);
-        // todo return 사장님 토큰
+
+        String token = jwtUtil.createToken(email, owner.getAuthority());
+
+        return new SignInOwnerResponseDto(token);
     }
 }

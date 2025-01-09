@@ -2,6 +2,7 @@ package com.example.outsourcingproject.auth.controller;
 
 import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
+import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -36,16 +37,15 @@ public class CustomerAuthController {
     }
 
     // 손님 로그인
-    // todo response 토큰
     @PostMapping("/auth/sign-in/customers")
-    public ResponseEntity<Void> signIn(
+    public ResponseEntity<SignInCustomerResponseDto> signIn(
         @RequestBody SignInCustomerRequestDto requestDto
     ) {
-        customerAuthService.signIn(
+        SignInCustomerResponseDto signInCustomerResponseDto = customerAuthService.signIn(
             requestDto.getEmail(),
             requestDto.getPassword()
         );
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(signInCustomerResponseDto, HttpStatus.OK);
     }
 }

@@ -1,7 +1,9 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.repository.CustomerAuthRepository;
+import com.example.outsourcingproject.utils.JwtUtil;
 import com.example.outsourcingproject.utils.PasswordEncoder;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
@@ -14,10 +16,12 @@ import org.springframework.stereotype.Service;
 public class CustomerAuthServiceImpl implements CustomerAuthService{
 
     private final CustomerAuthRepository customerAuthRepository;
+    private final JwtUtil jwtUtil;
     PasswordEncoder bcrypt = new PasswordEncoder();
 
-    public CustomerAuthServiceImpl(CustomerAuthRepository customerAuthRepository) {
+    public CustomerAuthServiceImpl(CustomerAuthRepository customerAuthRepository, JwtUtil jwtUtil) {
         this.customerAuthRepository = customerAuthRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -38,8 +42,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
     }
 
     @Override
-    public void signIn(String email, String rawPassword) {
-        // todo 반환
+    public SignInCustomerResponseDto signIn(String email, String rawPassword) {
 
         Customer customer = customerAuthRepository.findByEmail(email).
             orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
@@ -52,8 +55,10 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-
         log.info("손님 {} 로그인 완료}", email);
-        // todo return 손님 토큰
+
+        String token = jwtUtil.createToken(email, customer.getAuthority());
+
+        return new SignInCustomerResponseDto(token);
     }
 }

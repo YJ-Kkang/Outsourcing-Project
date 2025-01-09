@@ -2,6 +2,7 @@ package com.example.outsourcingproject.auth.controller;
 
 import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
+import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.service.OwnerAuthServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -34,17 +35,16 @@ public class OwnerAuthController {
     }
 
     // 사장님 로그인
-    // todo response 토큰
     @PostMapping("/auth/sign-in/owners")
-    public ResponseEntity<Void> signIn(
+    public ResponseEntity<SignInOwnerResponseDto> signIn(
         @RequestBody SignInOwnerRequestDto requestDto
     ) {
 
-        ownerAuthService.signIn(
+        SignInOwnerResponseDto signInOwnerResponseDto = ownerAuthService.signIn(
             requestDto.getEmail(),
             requestDto.getPassword()
         );
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(signInOwnerResponseDto, HttpStatus.OK);
     }
 }
