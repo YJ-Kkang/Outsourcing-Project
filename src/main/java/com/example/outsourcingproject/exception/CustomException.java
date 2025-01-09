@@ -1,4 +1,4 @@
-package com.example.outsourcingproject.config.error;
+package com.example.outsourcingproject.exception;
 
 import lombok.Getter;
 

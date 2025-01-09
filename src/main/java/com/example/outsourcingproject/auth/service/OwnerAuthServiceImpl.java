@@ -2,9 +2,9 @@ package com.example.outsourcingproject.auth.service;
 
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
-import com.example.outsourcingproject.config.PasswordEncoder;
-import com.example.outsourcingproject.config.error.CustomException;
-import com.example.outsourcingproject.config.error.ErrorCode;
+import com.example.outsourcingproject.utils.PasswordEncoder;
+import com.example.outsourcingproject.exception.CustomException;
+import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.entity.Owner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
