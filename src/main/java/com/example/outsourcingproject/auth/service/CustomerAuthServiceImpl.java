@@ -23,8 +23,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
     @Override
     public SignUpCustomersResponseDto signUp(String email, String password) {
 
-        // (1) 등록된 아이디(이메일) 여부 확인
-
+        // 등록된 아이디(이메일) 여부 확인
         boolean isExistEmail = customerAuthRepository.existsByEmail(email);
 
         if(isExistEmail) {
@@ -34,6 +33,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         Customer customer = new Customer(email, bcrypt.encode(password));
         Customer savedCustomer = customerAuthRepository.save(customer);
 
+        log.info("손님 {} 회원가입 완료", email);
         return new SignUpCustomersResponseDto(savedCustomer);
     }
 
@@ -53,7 +53,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
-        log.info("손님 로그인 성공 >>> {}", email);
+        log.info("손님 {} 로그인 완료}", email);
         // todo return 손님 토큰
     }
 }
