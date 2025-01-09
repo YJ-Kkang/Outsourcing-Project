@@ -41,7 +41,6 @@ public class CustomerAuthController {
     public ResponseEntity<Void> signIn(
         @RequestBody SignInCustomerRequestDto requestDto
     ) {
-        log.info("dsdsds");
         customerAuthService.signIn(
             requestDto.getEmail(),
             requestDto.getPassword()
