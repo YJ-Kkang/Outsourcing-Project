@@ -30,7 +30,7 @@ public class Customer extends BaseEntity {
     private String password;
 
     // Customer 테이블에 저장된 데이터의 authority는 무조건 손님
-    // 사장으로 권한 수정? -> 손님 데이터 삭제 후 사장님 테이블에 데이터 생성
+    // 사장으로 권한 수정? -> 손님 데이터 삭제 (탈퇴) 후 사장님 테이블에 데이터 생성 (회원가입) 하기
     @Enumerated(EnumType.STRING)
     @Column(updatable = false, nullable = false)
     private Authority authority;
@@ -45,7 +45,9 @@ public class Customer extends BaseEntity {
     }
 
     public Customer(
-        String email, String password) {
+        String email,
+        String password
+    ) {
         this.email = email;
         this.password = password;
         this.authority = Authority.CUSTOMER;
