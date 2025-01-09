@@ -43,7 +43,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
 
     @Override
     public SignInOwnerResponseDto signIn(String email, String rawPassword) {
-
+        // todo 로그인 상태가 아닌 사장만 들어올 수 있게
         Owner owner = ownerAuthRepository.findByEmail(email)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 

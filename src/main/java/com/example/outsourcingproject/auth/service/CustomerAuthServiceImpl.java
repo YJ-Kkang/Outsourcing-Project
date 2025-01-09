@@ -43,7 +43,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
     @Override
     public SignInCustomerResponseDto signIn(String email, String rawPassword) {
-
+        // todo 로그인 상태가 아닌 손님만 들어올 수 있게
         Customer customer = customerAuthRepository.findByEmail(email).
             orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
@@ -55,7 +55,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-        log.info("손님 {} 로그인 완료}", email);
+        log.info("손님 {} 로그인 완료", email);
 
         String token = jwtUtil.createToken(email, customer.getAuthority());
 
