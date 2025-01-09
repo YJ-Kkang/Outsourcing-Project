@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.controller;
 
+import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.service.OwnerAuthServiceImpl;
@@ -30,5 +31,20 @@ public class OwnerAuthController {
             requestDto.getPassword()
         );
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    }
+
+    // 사장님 로그인
+    // todo response 토큰
+    @PostMapping("/auth/sign-in/owners")
+    public ResponseEntity<Void> signIn(
+        @RequestBody SignInOwnerRequestDto requestDto
+    ) {
+
+        ownerAuthService.signIn(
+            requestDto.getEmail(),
+            requestDto.getPassword()
+        );
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

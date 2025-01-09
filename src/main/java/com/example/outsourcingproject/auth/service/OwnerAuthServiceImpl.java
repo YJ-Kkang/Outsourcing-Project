@@ -24,7 +24,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
     public SignUpOwnerResponseDto signUp(String email, String password) {
 
         // 등록된 아이디(이메일) 여부 확인
-        boolean isExistEmail = ownerAuthRepository.existsByEmail(email);
+        boolean isExistEmail = ownerAuthRepository.findByEmail(email).isPresent();
 
         if(isExistEmail) {
             log.info("이미 존재하는 이메일입니다. >> {}", email);
@@ -38,7 +38,22 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
     }
 
     @Override
-    public void SignIn(String email, String password) {
+    public void signIn(String email, String rawPassword) {
+        // todo 반환
 
+        Owner owner = ownerAuthRepository.findByEmail(email)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+
+        String encodedPassword = owner.getPassword();
+
+        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
+
+        if(isPasswordMisMatching){
+            log.info("아이디 또는 비밀번호가 잘못되었습니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        log.info("사장님 {} 로그인 완료", email);
+        // todo return 사장님 토큰
     }
 }
