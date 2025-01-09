@@ -41,10 +41,12 @@ public class CustomerAuthController {
     public ResponseEntity<Void> signIn(
         @RequestBody SignInCustomerRequestDto requestDto
     ) {
+        log.info("dsdsds");
         customerAuthService.signIn(
             requestDto.getEmail(),
             requestDto.getPassword()
         );
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

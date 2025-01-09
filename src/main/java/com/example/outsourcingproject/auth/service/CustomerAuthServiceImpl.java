@@ -49,8 +49,14 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
         String encodedPassword = customer.getPassword();
 
-        boolean isPasswordMatching = bcrypt.matches(rawPassword, encodedPassword);
+        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
 
+        if(isPasswordMisMatching){
+            log.info("아이디 또는 비밀번호가 잘못되었습니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        log.info("손님 로그인 성공 >>> {}", email);
         // todo return 손님 토큰
     }
 }
