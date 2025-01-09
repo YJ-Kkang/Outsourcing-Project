@@ -28,11 +28,8 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         boolean isExistEmail = customerAuthRepository.existsByEmail(email);
 
         if(isExistEmail) {
-            log.info("이미 가입된 이메일입니다. >> {}", email);
-
-            // 임시 예외처리
-            throw new RuntimeException("이미 가입된 이메일입니다.");
-            // todo 예외처리핸들러
+            log.info("이미 존재하는 이메일입니다. >> {}", email);
+            throw new CustomException(ErrorCode.EMAIL_EXIST);
         }
         Customer customer = new Customer(email, bcrypt.encode(password));
         Customer savedCustomer = customerAuthRepository.save(customer);
