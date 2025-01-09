@@ -5,22 +5,20 @@ import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequestMapping
-public class CustomerAuthController {
+public class CustomerAuthController { //todo 생성자 어노테이션으로
 
     private final CustomerAuthServiceImpl customerAuthService;
 
@@ -54,11 +52,13 @@ public class CustomerAuthController {
     }
 
     // 손님 탈퇴
-    @DeleteMapping("/owners")
+    @DeleteMapping("/customers")
     public ResponseEntity<Void> deleteCustomer(
         @RequestBody String password,
-        HttpServletResponse servletResponse
+        @RequestHeader("Authorization") String token
     ) {
+        customerAuthService.deleteCustomer(password, token);
 
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

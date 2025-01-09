@@ -8,4 +8,6 @@ public interface OwnerAuthService {
 
     SignInOwnerResponseDto signIn(String email, String password);
 
+    void deleteOwner(String password, String token);
+
 }

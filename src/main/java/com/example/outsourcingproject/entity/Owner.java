@@ -15,6 +15,7 @@ import lombok.Getter;
 
 @Getter
 @Entity
+//@SoftDelete //todo
 @Table(name = "owners")
 public class Owner extends BaseEntity {
 
@@ -34,11 +35,12 @@ public class Owner extends BaseEntity {
     @Column(updatable = false, nullable = false)
     private Authority authority;
 
+    // todo @softdelete 어노테이션을 쓸거면 지우기
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Integer isDeleted;
 
     @Column
-    private LocalDateTime deleted_at;
+    private LocalDateTime deletedAt;
 
     public Owner() {
     }
@@ -51,6 +53,6 @@ public class Owner extends BaseEntity {
         this.password = password;
         this.authority = Authority.OWNER;
         this.isDeleted = 0;
-        this.deleted_at = null;
+        this.deletedAt = null;
     }
 }

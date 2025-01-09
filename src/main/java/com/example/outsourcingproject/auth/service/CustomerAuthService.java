@@ -9,4 +9,6 @@ public interface CustomerAuthService {
 
     SignInCustomerResponseDto signIn(String email, String password);
 
+    void deleteCustomer(String password, String token);
+
 }

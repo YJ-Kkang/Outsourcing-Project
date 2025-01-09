@@ -56,12 +56,21 @@ public class JwtUtil {
 
     // 토큰에서 클레임 객체를 추출하는 메서드
     private Claims extractAllClaims(String token) {
+        token.replace("\\s", ""); // 공백 제거
         return Jwts.parser()
             .setSigningKey(key) // 비밀 키를 사용하여 서명 검증
             .parseClaimsJws(token)
             .getBody();
     }
 
+    // 토큰에서 손님 이메일 추출
+    public String extractCustomerEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
 
+    // 토큰에서 사장님 이메일 추출
+    public String extractOwnerEmail(String token) {
+        return extractAllClaims(token).getSubject();
+    }
 
 }
