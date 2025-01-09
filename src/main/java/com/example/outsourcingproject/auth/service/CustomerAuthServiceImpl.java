@@ -24,7 +24,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
     public SignUpCustomersResponseDto signUp(String email, String password) {
 
         // 등록된 아이디(이메일) 여부 확인
-        boolean isExistEmail = customerAuthRepository.existsByEmail(email);
+        boolean isExistEmail = customerAuthRepository.findByEmail(email).isPresent();
 
         if(isExistEmail) {
             log.info("이미 존재하는 이메일입니다. >> {}", email);
