@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("")
+@RequestMapping
 public class CustomerAuthController {
+
+    private final CustomerAuthServiceImpl customerAuthService;
 
     public CustomerAuthController(CustomerAuthServiceImpl customerAuthService) {
         this.customerAuthService = customerAuthService;
     }
-
-    private final CustomerAuthServiceImpl customerAuthService;
 
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
