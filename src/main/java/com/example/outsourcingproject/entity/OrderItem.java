@@ -14,7 +14,7 @@ import lombok.Getter;
 import org.hibernate.annotations.Comment;
 
 @Entity
-@Table(name = "ORDER_ITEMS")
+@Table(name = "order_items")
 @Getter
 public class OrderItem {
 

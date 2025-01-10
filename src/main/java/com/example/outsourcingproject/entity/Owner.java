@@ -1,7 +1,6 @@
 package com.example.outsourcingproject.entity;
 
 import com.example.outsourcingproject.common.Authority;
-import com.example.outsourcingproject.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

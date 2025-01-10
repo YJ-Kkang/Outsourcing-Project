@@ -1,15 +1,17 @@
 package com.example.outsourcingproject.orderitem.service;
 
+import com.example.outsourcingproject.common.CreateOrderItemWrapper;
+import com.example.outsourcingproject.common.ReadOrderItemWrapper;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.OrderItem;
-import com.example.outsourcingproject.common.OrderItemWrapper;
 import com.example.outsourcingproject.entity.Store;
-import com.example.outsourcingproject.order.OrderStatus;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
+import com.example.outsourcingproject.order.OrderStatus;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.orderitem.dto.request.CreateOrderItemRequestDto;
 import com.example.outsourcingproject.orderitem.dto.response.CreateOrderItemResponseDto;
+import com.example.outsourcingproject.orderitem.dto.response.OrderItemResponseDto;
 import com.example.outsourcingproject.orderitem.repository.OrderItemRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import java.time.LocalTime;
@@ -30,10 +32,9 @@ public class OrderItemServiceImpl implements OrderItemService {
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
 
-
     @Transactional
     @Override
-    public OrderItemWrapper createOrderItem(
+    public CreateOrderItemWrapper createOrderItem(
         Long storeId,
         List<CreateOrderItemRequestDto> requestDtoList
     ) {
@@ -109,12 +110,44 @@ public class OrderItemServiceImpl implements OrderItemService {
         savedOrder.updateTotals(totalAmountSum, totalPriceSum);
         orderRepository.save(savedOrder);
 
-        return new OrderItemWrapper(
+        return new CreateOrderItemWrapper(
             responseDtoList,
             totalAmountSum,
             totalPriceSum,
             savedOrder.getId(),
             savedOrder.getOrderStatus()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ReadOrderItemWrapper readAllOrderItemsByOrderId(Long orderId) {
+
+        Order foundOrder = orderRepository.findById(orderId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+            ); // todo 주문 식별자로 조회
+
+        List<OrderItem> orderItemList = new ArrayList<>();
+
+        orderItemList = orderItemRepository.findAllByOrderId(foundOrder.getId());
+
+        List<OrderItemResponseDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList = orderItemList.stream()
+            .map(item -> new OrderItemResponseDto(
+                    item.getId(),
+                    item.getEachAmount(),
+                    item.getTotalPrice()
+                )
+            ).toList();
+
+        return new ReadOrderItemWrapper(
+            responseDtoList,
+            foundOrder.getTotalAmountSum(),
+            foundOrder.getTotalPriceSum(),
+            foundOrder.getId(),
+            foundOrder.getOrderStatus()
         );
     }
 }

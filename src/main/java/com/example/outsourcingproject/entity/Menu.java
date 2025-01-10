@@ -13,11 +13,11 @@ import lombok.Getter;
 import org.hibernate.annotations.Comment;
 
 @Entity
-@Table(name = "MENUS")
+@Table(name = "menus")
 @Getter
 public class Menu extends BaseEntity {
 
-    @Comment("메뉴 식별자 ")
+    @Comment("메뉴 식별자")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "BIGINT")
@@ -31,7 +31,7 @@ public class Menu extends BaseEntity {
     )
     private String menuName;
 
-    @Comment("메뉴 가격 ")
+    @Comment("메뉴 가격")
     @Column(
         name = "menu_price",
         nullable = false
