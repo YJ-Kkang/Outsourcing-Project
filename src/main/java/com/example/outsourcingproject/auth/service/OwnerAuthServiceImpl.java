@@ -47,7 +47,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
         // todo 로그인 상태가 아닌 사장만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 사장님들 중에서 이메일 값이 일치하는 사장님 추출
-        Owner owner = ownerAuthRepository.findByEmailAndIsDeleted(email, true)
+        Owner owner = ownerAuthRepository.findByEmailAndIsDeleted(email, false)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
         String encodedPassword = owner.getPassword();
