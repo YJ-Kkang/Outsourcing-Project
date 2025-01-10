@@ -21,7 +21,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
     private final CustomerAuthRepository customerAuthRepository;
     private final JwtUtil jwtUtil;
-    private final TokenBlacklistService tokenBlacklistService;
+//    private final TokenBlacklistService tokenBlacklistService;
     PasswordEncoder bcrypt = new PasswordEncoder();
 
 
