@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
@@ -46,24 +47,30 @@ public class OwnerAuthServiceImpl implements OwnerAuthService {
     }
 
     @Override
-    public SignInOwnerResponseDto signIn(String email, String rawPassword) {
+    public SignInOwnerResponseDto signIn(SignInOwnerRequestDto requestDto) {
         // todo 로그인 상태가 아닌 사장만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 사장님들 중에서 이메일 값이 일치하는 사장님 추출
-        Owner owner = ownerAuthRepository.findByEmailAndIsDeleted(email, false)
+        Owner foundOwner = ownerAuthRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
-        String encodedPassword = owner.getPassword();
+        String encodedPassword = foundOwner.getPassword();
 
-        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
+        boolean isPasswordMismatching = !bcrypt.matches(
+            requestDto.getPassword(),
+            encodedPassword
+        );
 
-        if (isPasswordMisMatching) {
+        if (isPasswordMismatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-        log.info("사장님 {} 로그인 완료", email);
+        log.info("사장님 {} 로그인 완료", requestDto.getEmail());
 
-        String token = jwtUtil.createToken(email, owner.getAuthority());
+        String token = jwtUtil.createToken(
+            requestDto.getEmail(),
+            foundOwner.getAuthority()
+        );
 
         return new SignInOwnerResponseDto(token);
     }
