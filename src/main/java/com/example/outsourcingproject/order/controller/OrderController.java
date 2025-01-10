@@ -23,6 +23,7 @@ public class OrderController {
 
     private final OrderServiceImpl orderService;
 
+    // todo : 사장님 권한 추가해야 함
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> readAllOrdersAllStores() {
 
@@ -33,12 +34,16 @@ public class OrderController {
         return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
+    // todo : 사장님 권한 추가해야 함
     @GetMapping("/{storeId}")
-    public ResponseEntity<OrderResponseDto> readAllOrdersByStoreId(
+    public ResponseEntity<List<OrderResponseDto>> readAllOrdersByStoreId(
         @PathVariable("storeId") Long storeId
     ) {
-        // todo
-        return null;
+        List<OrderResponseDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList = orderService.readAllOrdersByStoreId(storeId);
+
+        return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
     @PatchMapping

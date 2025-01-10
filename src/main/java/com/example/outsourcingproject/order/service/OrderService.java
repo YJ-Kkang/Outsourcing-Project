@@ -11,6 +11,6 @@ public interface OrderService {
 
     List<OrderResponseDto> readAllOrdersFromStores();
 
-    OrderResponseDto readAllOrdersByStoreId(Long storeId);
+    List<OrderResponseDto> readAllOrdersByStoreId(Long storeId);
 
 }
