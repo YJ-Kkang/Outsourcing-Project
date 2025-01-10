@@ -4,10 +4,12 @@ import com.example.outsourcingproject.menu.dto.request.CreateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.request.UpdateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.response.CreateMenuResponseDto;
 import com.example.outsourcingproject.menu.dto.response.UpdateMenuResponseDto;
+import com.example.outsourcingproject.menu.service.MenuService;
 import com.example.outsourcingproject.menu.service.MenuServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MenuController {
 
-    private final MenuServiceImpl menuService;
+    private final MenuService menuService;
 
     @PostMapping
     public ResponseEntity<CreateMenuResponseDto> createMenu(
@@ -47,5 +49,14 @@ public class MenuController {
             requestDto
         );
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{menuId}")
+    public ResponseEntity<Void> deleteMenu(
+        @PathVariable("menuId") Long menuId
+    ) {
+        menuService.deleteMenu(menuId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
