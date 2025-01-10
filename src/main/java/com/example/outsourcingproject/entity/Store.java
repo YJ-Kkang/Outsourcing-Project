@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
@@ -24,15 +25,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StoreEntity extends BaseEntity {
+public class Store extends BaseEntity {
 
+    @Comment("가게 식별자")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long ownerId;
 
-    @Column(nullable = false)
-    private String storeName;
+//    @Column(nullable = false)
+//    private String storeName;
 
     @Column(nullable = false)
     private String storeTelephone;
@@ -48,17 +49,16 @@ public class StoreEntity extends BaseEntity {
     private LocalDateTime deletedAt;
 
 
-    public StoreEntity(
-//        Long ownerId,
+    public Store(
         String storeName,
         String storeTelephone,
         String storeAddress,
         Integer minimumPurchase,
         LocalTime opensAt,
-        LocalTime closesAt) {
+        LocalTime closesAt
+    ) {
 
-//        this.ownerId = ownerId;
-        this.storeName = storeName;
+//        this.storeName = storeName;
         this.storeTelephone = storeTelephone;
         this.storeAddress = storeAddress;
         this.minimumPurchase = minimumPurchase;
