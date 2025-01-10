@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.repository.CustomerAuthRepository;
@@ -17,28 +18,33 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CustomerAuthServiceImpl implements CustomerAuthService{
+public class CustomerAuthServiceImpl implements CustomerAuthService {
 
     private final CustomerAuthRepository customerAuthRepository;
     private final JwtUtil jwtUtil;
-//    private final TokenBlacklistService tokenBlacklistService;
+    //    private final TokenBlacklistService tokenBlacklistService;
     PasswordEncoder bcrypt = new PasswordEncoder();
 
 
     @Override
-    public SignUpCustomerResponseDto signUp(String email, String password) {
+    public SignUpCustomerResponseDto signUp(SignUpCustomerRequestDto requestDto) {
 
         // 등록된 아이디(이메일) 여부 확인
-        boolean isExistEmail = customerAuthRepository.findByEmail(email).isPresent();
+        boolean isExistingEmail = customerAuthRepository.findByEmail(requestDto.getEmail())
+            .isPresent();
 
-        if(isExistEmail) {
-            log.info("이미 존재하는 이메일입니다. >> {}", email);
+        if (isExistingEmail) {
+            log.info("이미 존재하는 이메일입니다. >> {}", requestDto.getEmail());
             throw new CustomException(ErrorCode.EMAIL_EXIST);
         }
-        Customer customer = new Customer(email, bcrypt.encode(password));
-        Customer savedCustomer = customerAuthRepository.save(customer);
+        Customer customerToSave = new Customer(
+            requestDto.getEmail(),
+            bcrypt.encode(requestDto.getPassword())
+        );
 
-        log.info("손님 {} 회원가입 완료", email);
+        Customer savedCustomer = customerAuthRepository.save(customerToSave);
+
+        log.info("손님 {} 회원가입 완료", requestDto.getEmail());
         return new SignUpCustomerResponseDto(savedCustomer);
     }
 
@@ -48,13 +54,13 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
         // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
         Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, false)
-                .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
         String encodedPassword = customer.getPassword();
 
         boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
 
-        if(isPasswordMisMatching){
+        if (isPasswordMisMatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
@@ -80,7 +86,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         String encodedPassword = customer.getPassword();
         boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
 
-        if(isPasswordMisMatching){
+        if (isPasswordMisMatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
@@ -92,7 +98,6 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         customerAuthRepository.updateDeletedAtByEmail(customerEmail, currentTime);
 
         // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
-
 
     }
 }
