@@ -67,10 +67,10 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
 
     @Override
     public void deleteOwner(String rawPassword, String token) {
-        // jwt 토큰에 저장된 손님 이메일 추출
-        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+        // jwt 토큰에 저장된 사장님 이메일 추출
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // 추출한 이메일로 손님 조회
+        // 추출한 이메일로 사장님 조회
         Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CUSTOMER));
 
@@ -89,7 +89,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
         LocalDateTime currentTime = LocalDateTime.now();
         ownerAuthRepository.updateDeletedAtByEmail(ownerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 데이터만 지우는 걸로
+        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
     }
 
 

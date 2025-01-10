@@ -91,7 +91,8 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         LocalDateTime currentTime = LocalDateTime.now();
         customerAuthRepository.updateDeletedAtByEmail(customerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 데이터만 지우는 걸로
+        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
+
 
     }
 }
