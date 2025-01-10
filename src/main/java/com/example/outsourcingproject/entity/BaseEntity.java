@@ -40,6 +40,20 @@ public abstract class BaseEntity {
     )
     private LocalDateTime updatedAt;
 
+
     protected BaseEntity() {
+    }
+
+    @Comment("삭제일")
+    @Column(
+        name = "deleted_at",
+        columnDefinition = "TIMESTAMP"
+    )
+    private LocalDateTime deletedAt;
+
+    // todo 각 엔티티에 있는 논리 삭제 속성 전부 다 하나로 맞춰야 함
+    // 소프트 딜리트 (논리 삭제) 기능
+    public void markAsDeleted() {
+        this.deletedAt = LocalDateTime.now(); // 현재 시간으로 삭제일 설정
     }
 }
