@@ -38,6 +38,27 @@ public class OrderItem {
     )
     private Integer totalPrice;
 
+    @Comment("메뉴 이름")
+    @Column(
+        name = "menu_name",
+        nullable = false
+    )
+    private String menuName;
+
+    @Comment("메뉴 가격")
+    @Column(
+        name = "menu_price",
+        nullable = false
+    )
+    private Integer menuPrice;
+
+    @Comment("메뉴 정보")
+    @Column(
+        name = "menu_info",
+        nullable = false
+    )
+    private String menuInfo;
+
     @Comment("메뉴 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -64,6 +85,9 @@ public class OrderItem {
     ) {
         this.order = order;
         this.menu = menu;
+        this.menuName = menu.getMenuName();
+        this.menuInfo = menu.getMenuInfo();
+        this.menuPrice = menu.getMenuPrice();
         this.eachAmount = eachAmount;
         this.totalPrice = calculateTotalPrice(eachAmount, menu.getMenuPrice());
     }
