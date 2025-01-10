@@ -10,6 +10,7 @@ import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
@@ -17,8 +18,6 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import javax.lang.model.element.NestingKind;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,14 +69,30 @@ public class StoreServiceImpl implements StoreService {
             savedStore.getClosesAt());
     }
 
-    // 가게 다건 조회
+    // 가게 다건 조회 : <store>을 <dto>로 변환
     @Override
-    public List<Store> findByStoreNameContaining(String storeName) {
-        List<Store> storeEntityList = storeRepository.findByStoreNameContaining(
-            storeName); // %LIKE%
-        return storeEntityList;
+    public List<StoreNameResponseDto> findByStoreNameContaining(String storeName) {
 
+        List<Store> storeNameList = storeRepository.findByStoreNameContaining(storeName);
+
+        List<StoreNameResponseDto> storeNameResponseDtoList = new ArrayList<>();
+
+        for (Store store : storeNameList) {
+            StoreNameResponseDto storeResponseDto = new StoreNameResponseDto(
+                store.getStoreName(),
+                store.getStoreAddress(),
+                store.getStoreTelephone(),
+                store.getMinimumPurchase(),
+                store.getOpensAt(),
+                store.getClosesAt()
+            );
+
+            storeNameResponseDtoList.add(storeResponseDto);
+        }
+
+        return storeNameResponseDtoList;
     }
+
 
     // 가게 및 해당 가게 메뉴 조회
     @Override
@@ -87,13 +102,16 @@ public class StoreServiceImpl implements StoreService {
             .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다.")); // todo 예외치리
 
         //1. 메뉴리스트 가져오기 (객체메뉴 생성
-        List<Menu> menuList = menuRepository.findAllByStoreId(storeId);
+        List<Menu> menuList = menuRepository.findAllByStoreId(store.getId());
         //2. 메뉴dto가 들어 있는 리스트 선언
         List<MenuDto> menuDtoList = new ArrayList<>();
         //3. 변환하기 (타입이 다르므로 Menu를 menuList에서 ‘하나씩’ 꺼내서 MenuDto 타입으로 변환한 다음에, menuDtoList에 넣기 ‘반복’
 
         for (Menu menu : menuList) {
-            MenuDto menuDto = new MenuDto(menu.getId(), menu.getMenuName(), menu.getMenuPrice(),
+            MenuDto menuDto = new MenuDto(
+                menu.getId(),
+                menu.getMenuName(),
+                menu.getMenuPrice(),
                 menu.getMenuInfo());
             menuDtoList.add(menuDto);
         }

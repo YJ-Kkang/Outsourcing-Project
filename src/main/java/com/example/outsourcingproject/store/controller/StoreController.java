@@ -4,6 +4,7 @@ import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.service.StoreService;
 import java.util.List;
@@ -45,13 +46,13 @@ public class StoreController {
         return new ResponseEntity<>(createStoreResponseDto, HttpStatus.CREATED);
     }
 
-    // 가게 다건 조회
+    // 가게 다건 조회 : entity에서 dto로 변환
     @GetMapping
-    public ResponseEntity<List<Store>> findAllStore(
+    public ResponseEntity<List<StoreNameResponseDto>> findAllStore(
         @RequestParam String search
     ) {
-        List<Store> storeResponseDtoList = storeService.findByStoreNameContaining(search);
-
+        List<StoreNameResponseDto> storeResponseDtoList = storeService.findByStoreNameContaining(search);
+        log.info("findAllStore:{}", storeResponseDtoList);
         return new ResponseEntity<>(storeResponseDtoList, HttpStatus.OK);
     }
 
