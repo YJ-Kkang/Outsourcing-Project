@@ -49,7 +49,7 @@ public class Review extends BaseEntity{
     @Comment("주문 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "orser_id",
+        name = "order_id",
         nullable = false
     )
     private Order order;
@@ -64,8 +64,10 @@ public class Review extends BaseEntity{
 
     protected Review() {}
 
-    public Review(Long id, String contents, Integer rating) {
-        this.id = id;
+    public Review(Customer customer, Store store, Order order, String contents, Integer rating) {
+        this.customer = customer;
+        this.store = store;
+        this.order = order;
         this.contents = contents;
         this.rating = rating;
     }
