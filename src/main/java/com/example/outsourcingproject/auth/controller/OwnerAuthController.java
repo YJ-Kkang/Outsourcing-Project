@@ -34,21 +34,17 @@ public class OwnerAuthController {
 
     // 사장님 로그인
     @PostMapping("/auth/sign-in/owners")
-    public ResponseEntity<SignInOwnerResponseDto> signIn(
+    public ResponseEntity<SignInOwnerResponseDto> signInOwner(
         @RequestBody SignInOwnerRequestDto requestDto
     ) {
-
-        SignInOwnerResponseDto signInOwnerResponseDto = ownerAuthService.signIn(
-            requestDto.getEmail(),
-            requestDto.getPassword()
-        );
+        SignInOwnerResponseDto signInOwnerResponseDto = ownerAuthService.signIn(requestDto);
 
         return new ResponseEntity<>(signInOwnerResponseDto, HttpStatus.OK);
     }
 
     // 사장님 탈퇴
     @DeleteMapping("/owners")
-    public ResponseEntity<Void> deleteCustomer(
+    public ResponseEntity<Void> deleteOwner(
         @RequestBody String password,
         @RequestHeader("Authorization") String token
     ) {
