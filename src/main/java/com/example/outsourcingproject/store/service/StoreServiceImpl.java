@@ -9,12 +9,14 @@ import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
+import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import java.time.LocalTime;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -112,15 +114,41 @@ public class StoreServiceImpl implements StoreService {
 
     // 가게 수정
     @Override
-    public StoreResponseDto updateStore(String storeName, String storeAddress,
-        String storeTelephone, Integer minimumPurchase, LocalTime opensAt, LocalTime closesAt) {
-        return null;
+    public UpdateStoreResponseDto updateStore(
+        Long id,
+        UpdateStoreRequestDto requestDto
+    ) {
+
+        Store foundStore = storeRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다."));
+
+        foundStore.update(
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt()
+        );
+
+        storeRepository.save(foundStore);
+
+        return new UpdateStoreResponseDto(
+            foundStore.getId(),
+            foundStore.getStoreName(),
+            foundStore.getStoreAddress(),
+            foundStore.getStoreTelephone(),
+            foundStore.getMinimumPurchase(),
+            foundStore.getOpensAt(),
+            foundStore.getClosesAt()
+        );
     }
 
-    // 가게 폐업
-    @Override
-    public void deleteStore(Long storeId) {
-
-    }
+//
+//    // 가게 폐업
+//    @Override
+//    public void deleteStore(Long storeId) {
+//
+//    }
 
 }

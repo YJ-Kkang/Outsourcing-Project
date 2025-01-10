@@ -89,4 +89,21 @@ public class Store extends BaseEntity {
         this.opensAt = opensAt;
         this.closesAt = closesAt;
     }
+
+    public void update(
+        String storeName,
+        String storeAddress,
+        String storeTelephone,
+        Integer minimumPurchase,
+        LocalTime opensAt,
+        LocalTime closesAt
+    ) {
+        this.storeName = storeName;
+        this.storeAddress = storeAddress;
+        this.storeTelephone = storeTelephone;
+        this.minimumPurchase = minimumPurchase;
+        this.opensAt = opensAt;
+        this.closesAt = closesAt;
+    }
+
 }
