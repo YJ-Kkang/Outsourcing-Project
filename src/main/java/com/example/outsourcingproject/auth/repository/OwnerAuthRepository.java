@@ -15,7 +15,7 @@ public interface OwnerAuthRepository extends JpaRepository<Owner, Long> {
     Optional<Owner> findByEmail(String email);
 
     // 탈퇴한 사장님은 제외하고 이메일이 일치하는 데이터 조회
-    Optional<Owner> findByEmailAndIsDeleted(String email, int isDeleted);
+    Optional<Owner> findByEmailAndIsDeleted(String email, Boolean isDeleted);
 
     // Email을 기준으로 isDeleted 값을 업데이트
     @Modifying
