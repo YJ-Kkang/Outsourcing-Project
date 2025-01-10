@@ -1,34 +1,27 @@
 package com.example.outsourcingproject.store.dto.response;
 
+import com.example.outsourcingproject.entity.Store;
 import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
 public class CreateStoreResponseDto {
 
-  private Long id;
-  private final String storeName;
-  private final String storeAddress;
-  private final String storeTelephone;
-  private final Integer minimumPurchase;
-  private final LocalTime opensAt;
-  private final LocalTime closesAt;
+    private final Long id;
+    private final String storeName;
+    private final String storeAddress;
+    private final String storeTelephone;
+    private final Integer minimumPurchase;
+    private final LocalTime opensAt;
+    private final LocalTime closesAt;
 
-  public CreateStoreResponseDto(
-      Long id,
-      String storeName,
-      String storeAddress,
-      String storeTelephone,
-      Integer minimumPurchase,
-      LocalTime opensAt,
-      LocalTime closesAt
-  ) {
-    this.id = id;
-    this.storeName = storeName;
-    this.storeAddress = storeAddress;
-    this.storeTelephone = storeTelephone;
-    this.minimumPurchase = minimumPurchase;
-    this.opensAt = opensAt;
-    this.closesAt = closesAt;
-  }
+    public CreateStoreResponseDto(Store store) {
+        this.id = store.getId();
+        this.storeName = store.getStoreName();
+        this.storeAddress = store.getStoreAddress();
+        this.storeTelephone = store.getStoreTelephone();
+        this.minimumPurchase = store.getMinimumPurchase();
+        this.opensAt = store.getOpensAt();
+        this.closesAt = store.getClosesAt();
+    }
 }
