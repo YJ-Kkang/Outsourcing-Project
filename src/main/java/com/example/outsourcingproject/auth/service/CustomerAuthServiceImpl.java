@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
@@ -49,24 +50,31 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
     }
 
     @Override
-    public SignInCustomerResponseDto signIn(String email, String rawPassword) {
+    public SignInCustomerResponseDto signIn(SignInCustomerRequestDto requestDto) {
         // todo 로그인 상태가 아닌 손님만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
-        Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, false)
+        Customer foundCustomer = customerAuthRepository.findByEmailAndIsDeletedFalse(
+                requestDto.getEmail())
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
-        String encodedPassword = customer.getPassword();
+        String encodedPassword = foundCustomer.getPassword();
 
-        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
+        boolean isPasswordMismatching = !bcrypt.matches(
+            requestDto.getPassword(),
+            encodedPassword
+        );
 
-        if (isPasswordMisMatching) {
+        if (isPasswordMismatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-        log.info("손님 {} 로그인 완료", email);
+        log.info("손님 {} 로그인 완료", requestDto.getEmail());
 
-        String token = jwtUtil.createToken(email, customer.getAuthority());
+        String token = jwtUtil.createToken(
+            requestDto.getEmail(),
+            foundCustomer.getAuthority()
+        );
 
         return new SignInCustomerResponseDto(token);
     }
@@ -79,11 +87,11 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
         String customerEmail = jwtUtil.extractCustomerEmail(token);
 
         // 추출한 이메일로 손님 조회
-        Customer customer = customerAuthRepository.findByEmail(customerEmail)
+        Customer foundCustomer = customerAuthRepository.findByEmail(customerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CUSTOMER));
 
         // 비밀번호 일치 여부 확인
-        String encodedPassword = customer.getPassword();
+        String encodedPassword = foundCustomer.getPassword();
         boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
 
         if (isPasswordMisMatching) {

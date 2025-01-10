@@ -26,24 +26,22 @@ public class CustomerAuthController {
 
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
-    public ResponseEntity<SignUpCustomerResponseDto> signUp(
+    public ResponseEntity<SignUpCustomerResponseDto> signUpCustomer(
         @RequestBody SignUpCustomerRequestDto requestDto
     ) {
         SignUpCustomerResponseDto responseDto = customerAuthService.signUp(requestDto);
+
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     // 손님 로그인
     @PostMapping("/auth/sign-in/customers")
-    public ResponseEntity<SignInCustomerResponseDto> signIn(
+    public ResponseEntity<SignInCustomerResponseDto> signInCustomer(
         @RequestBody SignInCustomerRequestDto requestDto
     ) {
-        SignInCustomerResponseDto signInCustomerResponseDto = customerAuthService.signIn(
-            requestDto.getEmail(),
-            requestDto.getPassword()
-        );
+        SignInCustomerResponseDto responseDto = customerAuthService.signIn(requestDto);
 
-        return new ResponseEntity<>(signInCustomerResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 손님 탈퇴
