@@ -1,6 +1,7 @@
 package com.example.outsourcingproject.store.dto.response;
 
 
+import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -19,21 +20,15 @@ public class StoreResponseDto {
     private List<MenuDto> menuList = new ArrayList<>();
 
     public StoreResponseDto(
-        String storeName,
-        String storeAddress,
-        String storeTelephone,
-        Integer minimumPurchase,
-        LocalTime opensAt,
-        LocalTime closesAt,
+        Store store,
         List<MenuDto> menuList
     ) {
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
-        this.storeTelephone = storeTelephone;
-        this.minimumPurchase = minimumPurchase;
-        this.opensAt = opensAt;
-        this.closesAt = closesAt;
+        this.storeName = store.getStoreName();
+        this.storeAddress = store.getStoreAddress();
+        this.storeTelephone = store.getStoreTelephone();
+        this.minimumPurchase = store.getMinimumPurchase();
+        this.opensAt = store.getOpensAt();
+        this.closesAt = store.getClosesAt();
         this.menuList = menuList;
     }
-
 }

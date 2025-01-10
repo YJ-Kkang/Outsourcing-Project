@@ -16,7 +16,7 @@ public interface StoreService {
 
     List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName);
 
-    StoreResponseDto findByStoreId(Long storeId);
+    StoreResponseDto findStoreByStoreId(Long storeId);
 
     StoreResponseDto updateStore(
         String storeName,
