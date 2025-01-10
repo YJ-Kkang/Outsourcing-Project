@@ -44,8 +44,9 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
     @Override
     public SignInCustomerResponseDto signIn(String email, String rawPassword) {
-        // todo 로그인 상태가 아닌 손님만 들어올 수 있게
-        // todo 탈퇴 유저는 로그인 x
+        // todo 로그인 상태가 아닌 손님만 들어올 수 있게 -> 필터
+
+        // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
         Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, 0)
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
@@ -90,7 +91,8 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         LocalDateTime currentTime = LocalDateTime.now();
         customerAuthRepository.updateDeletedAtByEmail(customerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 데이터만 지우는 걸로
+        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
+
 
     }
 }

@@ -44,9 +44,10 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
 
     @Override
     public SignInOwnerResponseDto signIn(String email, String rawPassword) {
-        // todo 로그인 상태가 아닌 사장만 들어올 수 있게
-        // todo 탈퇴 유저는 로그인 x
-        Owner owner = ownerAuthRepository.findByEmail(email)
+        // todo 로그인 상태가 아닌 사장만 들어올 수 있게 -> 필터
+
+        // 탈퇴하지 않은 사장님들 중에서 이메일 값이 일치하는 사장님 추출
+        Owner owner = ownerAuthRepository.findByEmailAndIsDeleted(email, 0)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
         String encodedPassword = owner.getPassword();
@@ -66,10 +67,10 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
 
     @Override
     public void deleteOwner(String rawPassword, String token) {
-        // jwt 토큰에 저장된 손님 이메일 추출
-        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+        // jwt 토큰에 저장된 사장님 이메일 추출
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // 추출한 이메일로 손님 조회
+        // 추출한 이메일로 사장님 조회
         Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CUSTOMER));
 
@@ -88,7 +89,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
         LocalDateTime currentTime = LocalDateTime.now();
         ownerAuthRepository.updateDeletedAtByEmail(ownerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 데이터만 지우는 걸로
+        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
     }
 
 

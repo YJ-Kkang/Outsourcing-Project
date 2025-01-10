@@ -36,7 +36,7 @@ public class StoreServiceImpl implements StoreService {
         LocalTime closesAt = requestDto.getClosesAt();
 
         // jwt 토큰에 저장된 사장님 이메일 추출
-        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
         // 사장님 이메일로 사장님 아이디 추출
         Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
