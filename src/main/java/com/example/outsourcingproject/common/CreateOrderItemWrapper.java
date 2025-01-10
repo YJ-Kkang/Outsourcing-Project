@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class OrderItemWrapper {
+public class CreateOrderItemWrapper {
 
     private final List<CreateOrderItemResponseDto> orderDetails;
     private final Integer totalAmountSum;
@@ -14,7 +14,7 @@ public class OrderItemWrapper {
     private final Long orderId;
     private final OrderStatus orderStatus;
 
-    public OrderItemWrapper(
+    public CreateOrderItemWrapper(
         List<CreateOrderItemResponseDto> orderDetails,
         Integer totalAmountSum,
         Integer totalPriceSum,
