@@ -10,7 +10,7 @@ import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
-import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
@@ -65,28 +65,23 @@ public class StoreServiceImpl implements StoreService {
         return new CreateStoreResponseDto(savedStore);
     }
 
-    // 가게 다건 조회 : <store>을 <dto>로 변환
+    @Transactional(readOnly = true)
     @Override
-    public List<StoreNameResponseDto> findByStoreNameContaining(String storeName) {
+    public List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName) {
 
-        List<Store> storeNameList = storeRepository.findByStoreNameContaining(storeName);
+        List<Store> storeList = new ArrayList<>();
 
-        List<StoreNameResponseDto> storeNameResponseDtoList = new ArrayList<>();
+        storeList = storeRepository.findByStoreNameContainingAndIsDeletedFalse(storeName);
 
-        for (Store store : storeNameList) {
-            StoreNameResponseDto storeResponseDto = new StoreNameResponseDto(
-                store.getStoreName(),
-                store.getStoreAddress(),
-                store.getStoreTelephone(),
-                store.getMinimumPurchase(),
-                store.getOpensAt(),
-                store.getClosesAt()
-            );
+        List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
 
-            storeNameResponseDtoList.add(storeResponseDto);
+        for (Store foundStore : storeList) {
+            StoreNameSearchResponseDto responseDto = new StoreNameSearchResponseDto(foundStore);
+
+            responseDtoList.add(responseDto);
         }
 
-        return storeNameResponseDtoList;
+        return responseDtoList;
     }
 
 
