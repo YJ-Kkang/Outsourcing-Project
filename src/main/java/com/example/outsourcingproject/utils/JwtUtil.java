@@ -2,9 +2,13 @@ package com.example.outsourcingproject.utils;
 
 import com.example.outsourcingproject.common.Authority;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Base64;
@@ -74,6 +78,33 @@ public class JwtUtil {
     // 토큰에서 사장님 이메일 추출
     public String extractOwnerEmail(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    // 토큰 유효성 검사
+    public boolean validateToken(String token) {
+        try {
+            // JWT 파서 빌더를 사용하여 토큰의 서명을 검증한다.
+            Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token); // 토큰 파싱 및 검증
+            return true; // 토큰이 유효한 경우
+
+        } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            // 토큰 서명이 잘못되었더나, 잘못된 형식의 JWT가 전달된 경우
+            log.error("유효하지 않는 JWT 서명입니다.", e);
+        } catch (ExpiredJwtException e) {
+            // 토크이 만료된 경우
+            log.error("만료된 JWT Token 입니다.");
+        } catch (UnsupportedJwtException e) {
+            // 지원되지 않는 JWT 형식이 전달된 경우
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
+        } catch (IllegalArgumentException e) {
+            // JWT 클레임이 비어있거나 잘못된 형식일 경우
+            log.error("잘못된 JWT 토큰입니다.", e);
+        }
+
+        return false; // 토큰이 유효하지 않은 경우
     }
 
 }
