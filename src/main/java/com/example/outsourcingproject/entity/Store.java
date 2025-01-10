@@ -45,11 +45,12 @@ public class Store extends BaseEntity {
     public Store(
         Long ownerId,
         String storeName,
-        String storeTelephone,
         String storeAddress,
+        String storeTelephone,
         Integer minimumPurchase,
         LocalTime opensAt,
-        LocalTime closesAt) {
+        LocalTime closesAt
+    ) {
 
         this.ownerId = ownerId;
         this.storeName = storeName;
