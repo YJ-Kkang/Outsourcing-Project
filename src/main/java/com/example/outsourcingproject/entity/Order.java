@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 @Entity
-@Table(name = "ORDERS")
+@Table(name = "orders")
 @Getter
 public class Order extends BaseEntity {
 
