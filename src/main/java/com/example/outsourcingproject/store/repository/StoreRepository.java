@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
+    Long countByOwnerId(Long ownerId);
+
     List<Store> findByStoreNameContaining(String storeName);
 }
 

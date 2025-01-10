@@ -19,8 +19,10 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,12 @@ public class StoreServiceImpl implements StoreService {
 
         Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED)); // todo
+
+        Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
+
+        if (storeCount > 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        } // todo 사장님의 가게 수가 최대 3개이므로 4개째부터 예외 발생
 
         Store storeToSave = new Store(
             foundOwner.getId(),
