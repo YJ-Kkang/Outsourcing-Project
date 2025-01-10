@@ -70,7 +70,7 @@ public class StoreServiceImpl implements StoreService {
 //        return storeEntityList.stream()
 //            .map(StoreResponseDto::new)
 //            .collect(Collectors.toList());
-        return null;
+        return storeEntityList;
 
     }
 
