@@ -2,7 +2,7 @@ package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
 import com.example.outsourcingproject.entity.Owner;
-import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.entity.StoreEntity;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
@@ -28,7 +28,6 @@ public class StoreServiceImpl implements StoreService {
         CreateStoreRequestDto requestDto,
         String token
     ) {
-
         String storeName = requestDto.getStoreName();
         String storeAddress = requestDto.getStoreAddress();
         String storeTelephone = requestDto.getStoreTelephone();
@@ -45,22 +44,17 @@ public class StoreServiceImpl implements StoreService {
         Long ownerId = owner.getId();
 
         // StoreEntity 생성 (가게 정보를 엔티티로 변환)
-        Store store = new Store();
+        StoreEntity store = new StoreEntity(
+            ownerId, storeName, storeAddress, storeTelephone,
+            minimumPurchase,opensAt, closesAt
+        );
 
-        // todo 세터라서 고쳐야함
-        store.setStoreAddress(storeAddress);
-        store.setStoreTelephone(storeTelephone);
-        store.setMinimumPurchase(minimumPurchase);
-        store.setOpensAt(opensAt);
-        store.setClosesAt(closesAt);
-        store.setId(ownerId);
-
-
-        Store savedStore = storeRepository.save(store);
         // 데이터베이스에 가게 저장
+        StoreEntity savedStore = storeRepository.save(store);
+
         return new CreateStoreResponseDto(
             savedStore.getId(),
-            "수정할 곳",
+            savedStore.getStoreName(),
             savedStore.getStoreAddress(),
             savedStore.getStoreTelephone(),
             savedStore.getMinimumPurchase(),
