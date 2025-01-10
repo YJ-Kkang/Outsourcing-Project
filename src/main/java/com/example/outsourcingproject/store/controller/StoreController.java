@@ -57,14 +57,15 @@ public class StoreController {
         return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
-    // 가게 단건 조회
     @GetMapping("/{storeId}")
-    public ResponseEntity<StoreResponseDto> findByStoreId(
-        @PathVariable Long storeId
+    public ResponseEntity<StoreResponseDto> readOneStore(
+        @PathVariable("storeId") Long storeId
     ) {
-        StoreResponseDto storeResponseDto = storeService.findByStoreId(storeId);
-        log.info(storeResponseDto.getStoreName());
-        return new ResponseEntity<>(storeResponseDto, HttpStatus.OK);
+        StoreResponseDto responseDto = storeService.findStoreByStoreId(storeId);
+
+        log.info(responseDto.getStoreName());
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 가게 수정

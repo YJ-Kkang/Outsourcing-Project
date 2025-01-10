@@ -14,7 +14,6 @@ import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponse
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class StoreServiceImpl implements StoreService {
 
         Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
 
-        if (storeCount > 3) {
+        if (storeCount >= 3) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         } // todo 사장님의 가게 수가 최대 3개이므로 4개째부터 예외 발생
 
@@ -84,36 +83,29 @@ public class StoreServiceImpl implements StoreService {
         return responseDtoList;
     }
 
-
-    // 가게 및 해당 가게 메뉴 조회
+    @Transactional(readOnly = true)
     @Override
-    public StoreResponseDto findByStoreId(Long storeId) {
+    public StoreResponseDto findStoreByStoreId(Long storeId) {
 
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다.")); // todo 예외치리
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+            );
+        // todo 가게 id로 가게를 찾을 수 없을 시 예외 처리
 
-        //1. 메뉴리스트 가져오기 (객체메뉴 생성
-        List<Menu> menuList = menuRepository.findAllByStoreId(store.getId());
-        //2. 메뉴dto가 들어 있는 리스트 선언
+        List<Menu> menuList = new ArrayList<>();
+
+        menuList = menuRepository.findAllByStoreIdAndIsDeletedFalse(foundStore.getId());
+
         List<MenuDto> menuDtoList = new ArrayList<>();
-        //3. 변환하기 (타입이 다르므로 Menu를 menuList에서 ‘하나씩’ 꺼내서 MenuDto 타입으로 변환한 다음에, menuDtoList에 넣기 ‘반복’
 
-        for (Menu menu : menuList) {
-            MenuDto menuDto = new MenuDto(
-                menu.getId(),
-                menu.getMenuName(),
-                menu.getMenuPrice(),
-                menu.getMenuInfo());
+        for (Menu foundMenu : menuList) {
+            MenuDto menuDto = new MenuDto(foundMenu);
             menuDtoList.add(menuDto);
         }
 
         return new StoreResponseDto(
-            store.getStoreName(),
-            store.getStoreAddress(),
-            store.getStoreTelephone(),
-            store.getMinimumPurchase(),
-            store.getOpensAt(),
-            store.getClosesAt(),
+            foundStore,
             menuDtoList
         );
     }
