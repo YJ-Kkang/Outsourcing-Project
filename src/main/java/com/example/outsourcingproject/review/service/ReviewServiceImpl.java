@@ -1,13 +1,17 @@
 package com.example.outsourcingproject.review.service;
 
+import com.example.outsourcingproject.auth.repository.CustomerAuthRepository;
+import com.example.outsourcingproject.entity.Customer;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.Review;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.order.OrderStatus;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.review.dto.request.CreateReviewRequestDto;
 import com.example.outsourcingproject.review.dto.response.CreateReviewResponseDto;
 import com.example.outsourcingproject.review.repository.ReviewRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
+import com.example.outsourcingproject.utils.JwtUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,28 +25,43 @@ public class ReviewServiceImpl{
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
+    private final CustomerAuthRepository customerAuthRepository;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public CreateReviewResponseDto createReviewService(
         Long orderId,
-        CreateReviewRequestDto requestDto
+        CreateReviewRequestDto requestDto,
+        String token
     ) {
         // 리뷰 데이터를 저장하기 위한 사전 작업
+        // 주문 조회
         Order foundorder = orderRepository.findById(orderId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
             ); // todo 오더 식별자로 주문 조회했을 때 주문이 없으면 예외 처리
 
+        // 주문 상태가 배송 완료일 경우에만 리뷰를 쓸 수 있도록 예외처리
+        boolean isNotDeliverd = !foundorder.getOrderStatus().equals(OrderStatus.DELIVERED);
+
+        if (isNotDeliverd) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); // todo OrderStatus가 배송완료 아닌 경우 예외 처리
+        }
+
+        // 가게 정보 가져오기
         Store foundStore = foundorder.getStore();
 
-        // (1) 오더 객체에 유저아이디 없음 | (2) 토큰에서 유저아이디 어떻게 뽑아올 수 있는지 묻기
-        // 토큰 안에 유저에 대한 정보가 담겨 있을 수 있다. 여기서 유저아이디 가져와서 넣어주는 게 좋은지,
-        // 아니면 오더라는 객체 통해서 유저아이디 넣어주는 게 좋은지 고민하기...
-        // -> todo 아직 인증인가 부분 해결 안돼서 즉각 적용 어렵다고 함. 추후에 보완하기
+        // jwt 토큰에 저장된 손님 이메일 추출
+        String customerEmail = jwtUtil.extractCustomerEmail(token);
+
+        // 손님 이메일로 손님 아이디 추출
+        Customer foundCustomer = customerAuthRepository.findByEmail(customerEmail)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+            ); // todo 손님 이메일로 찾을 수 있는 아이디 없으면 예외 처리
 
         // Dto에서 리뷰 내용 가져오고, 리뷰 엔티티 만들어주기(엔티티 == 테이블)
         Review reviewToSave = new Review(
-            foundCustomer, // todo 인증인가 부분 해결되면 넣기
+            foundCustomer,
             foundStore,
             foundorder,
             requestDto.getContents(),
@@ -55,7 +74,6 @@ public class ReviewServiceImpl{
         // 저장된 리뷰 데이터에서 값 추출하기
         Long savedReviewId = savedReview.getId();
         LocalDateTime savedLocalDateTime = savedReview.getCreatedAt();
-
 
         return new CreateReviewResponseDto (
             savedReviewId,
