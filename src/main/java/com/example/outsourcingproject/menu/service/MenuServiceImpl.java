@@ -84,4 +84,15 @@ public class MenuServiceImpl implements MenuService {
             foundMenu.getMenuInfo()
         );
     }
+
+    @Transactional
+    @Override
+    public void deleteMenu(Long menuId) {
+        Menu foundMenu = menuRepository.findById(menuId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+            );
+
+        foundMenu.markAsDeleted();
+    }
 }
