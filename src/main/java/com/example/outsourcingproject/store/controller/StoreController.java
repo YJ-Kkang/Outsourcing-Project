@@ -4,12 +4,15 @@ import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.service.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
@@ -42,13 +46,13 @@ public class StoreController {
         return new ResponseEntity<>(createStoreResponseDto, HttpStatus.CREATED);
     }
 
-    // 가게 다건 조회
+    // 가게 다건 조회 : entity에서 dto로 변환
     @GetMapping
-    public ResponseEntity<List<Store>> findAllStore(
+    public ResponseEntity<List<StoreNameResponseDto>> findAllStore(
         @RequestParam String search
     ) {
-        List<Store> storeResponseDtoList = storeService.findByStoreNameContaining(search);
-
+        List<StoreNameResponseDto> storeResponseDtoList = storeService.findByStoreNameContaining(search);
+        log.info("findAllStore:{}", storeResponseDtoList);
         return new ResponseEntity<>(storeResponseDtoList, HttpStatus.OK);
     }
 
@@ -58,7 +62,7 @@ public class StoreController {
         @PathVariable Long storeId
     ) {
         StoreResponseDto storeResponseDto = storeService.findByStoreId(storeId);
-
+        log.info(storeResponseDto.getStoreName());
         return new ResponseEntity<>(storeResponseDto, HttpStatus.OK);
     }
 

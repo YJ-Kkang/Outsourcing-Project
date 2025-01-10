@@ -1,8 +1,8 @@
 package com.example.outsourcingproject.store.service;
 
-import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import java.time.LocalTime;
 import java.util.List;
@@ -14,7 +14,7 @@ public interface StoreService {
        String token
    );
 
-   List<Store> findByStoreNameContaining(String storeName);
+   List<StoreNameResponseDto> findByStoreNameContaining(String storeName);
 
    StoreResponseDto findByStoreId(Long storeId);
 
