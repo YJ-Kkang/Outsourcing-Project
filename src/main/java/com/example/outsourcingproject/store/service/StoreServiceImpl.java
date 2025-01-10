@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,43 +31,30 @@ public class StoreServiceImpl implements StoreService {
     private final JwtUtil jwtUtil;
     private final MenuRepository menuRepository;
 
+    @Transactional
     @Override
     public CreateStoreResponseDto createStore(
         CreateStoreRequestDto requestDto,
         String token
     ) {
-        String storeName = requestDto.getStoreName();
-        String storeAddress = requestDto.getStoreAddress();
-        String storeTelephone = requestDto.getStoreTelephone();
-        Integer minimumPurchase = requestDto.getMinimumPurchase();
-        LocalTime opensAt = requestDto.getOpensAt();
-        LocalTime closesAt = requestDto.getClosesAt();
-
-        // jwt 토큰에 저장된 사장님 이메일 추출
         String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // 사장님 이메일로 사장님 아이디 추출
-        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
-        Long ownerId = owner.getId();
+        Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED)); // todo
 
-        // StoreEntity 생성 (가게 정보를 엔티티로 변환)
-        Store store = new Store(
-            ownerId, storeName, storeAddress, storeTelephone,
-            minimumPurchase, opensAt, closesAt
+        Store storeToSave = new Store(
+            foundOwner.getId(),
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt()
         );
 
-        // 데이터베이스에 가게 저장
-        Store savedStore = storeRepository.save(store);
+        Store savedStore = storeRepository.save(storeToSave);
 
-        return new CreateStoreResponseDto(
-            savedStore.getId(),
-            savedStore.getStoreName(),
-            savedStore.getStoreAddress(),
-            savedStore.getStoreTelephone(),
-            savedStore.getMinimumPurchase(),
-            savedStore.getOpensAt(),
-            savedStore.getClosesAt());
+        return new CreateStoreResponseDto(savedStore);
     }
 
     // 가게 다건 조회 : <store>을 <dto>로 변환
