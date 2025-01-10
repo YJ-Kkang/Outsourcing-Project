@@ -47,7 +47,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
         // todo 로그인 상태가 아닌 손님만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
-        Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, 0)
+        Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, false)
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
         String encodedPassword = customer.getPassword();
