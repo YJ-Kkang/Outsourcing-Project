@@ -57,7 +57,9 @@ public class JwtUtil {
 
     // 토큰에서 클레임 객체를 추출하는 메서드
     private Claims extractAllClaims(String token) {
-        token.replace("\\s", ""); // 공백 제거
+        log.info("기존 token : {} ",token);
+        token = token.replace("Bearer ", ""); // 앞에 붙는 'Bearer ' 제거
+        log.info("수정된 token : {} ",token);
         return Jwts.parser()
             .setSigningKey(key) // 비밀 키를 사용하여 서명 검증
             .parseClaimsJws(token)

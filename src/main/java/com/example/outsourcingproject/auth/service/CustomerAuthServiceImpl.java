@@ -46,7 +46,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
     public SignInCustomerResponseDto signIn(String email, String rawPassword) {
         // todo 로그인 상태가 아닌 손님만 들어올 수 있게
         // todo 탈퇴 유저는 로그인 x
-        Customer customer = customerAuthRepository.findByEmail(email)
+        Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, 0)
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
         String encodedPassword = customer.getPassword();
