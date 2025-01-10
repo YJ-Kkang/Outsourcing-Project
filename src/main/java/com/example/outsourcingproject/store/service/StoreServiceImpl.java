@@ -2,7 +2,7 @@ package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
 import com.example.outsourcingproject.entity.Owner;
-import com.example.outsourcingproject.entity.StoreEntity;
+import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
@@ -44,13 +44,13 @@ public class StoreServiceImpl implements StoreService {
         Long ownerId = owner.getId();
 
         // StoreEntity 생성 (가게 정보를 엔티티로 변환)
-        StoreEntity store = new StoreEntity(
+        Store store = new Store(
             ownerId, storeName, storeAddress, storeTelephone,
             minimumPurchase,opensAt, closesAt
         );
 
         // 데이터베이스에 가게 저장
-        StoreEntity savedStore = storeRepository.save(store);
+        Store savedStore = storeRepository.save(store);
 
         return new CreateStoreResponseDto(
             savedStore.getId(),
@@ -64,8 +64,8 @@ public class StoreServiceImpl implements StoreService {
 
     // 가게 다건 조회
     @Override
-    public List<StoreResponseDto> findByStoreNameContaining(String storeName) {
-//        List<StoreEntity> storeEntityList = storeRepository.findByStoreNameContaing(storeName); // %LIKE%
+    public List<Store> findByStoreNameContaining(String storeName) {
+        List<Store> storeEntityList = storeRepository.findByStoreNameContaining(storeName); // %LIKE%
 
 //        return storeEntityList.stream()
 //            .map(StoreResponseDto::new)

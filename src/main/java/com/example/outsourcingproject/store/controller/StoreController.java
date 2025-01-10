@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.store.controller;
 
+import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
@@ -43,10 +44,10 @@ public class StoreController {
 
     // 가게 다건 조회
     @GetMapping
-    public ResponseEntity<List<StoreResponseDto>> findAllStore(
-        @RequestParam String storeName
+    public ResponseEntity<List<Store>> findAllStore(
+        @RequestParam String search
     ) {
-        List<StoreResponseDto> storeResponseDtoList = storeService.findByStoreNameContaining(storeName);
+        List<Store> storeResponseDtoList = storeService.findByStoreNameContaining(search);
 
         return new ResponseEntity<>(storeResponseDtoList, HttpStatus.OK);
     }

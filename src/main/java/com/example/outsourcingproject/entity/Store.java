@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
@@ -19,8 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "stores")
 @Getter
-@Setter
-public class StoreEntity extends BaseEntity {
+public class Store extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,10 +39,10 @@ public class StoreEntity extends BaseEntity {
     private Integer isDeleted;
     private LocalDateTime deletedAt;
 
-    public StoreEntity() {
+    public Store() {
     }
 
-    public StoreEntity(
+    public Store(
         Long ownerId,
         String storeName,
         String storeTelephone,
