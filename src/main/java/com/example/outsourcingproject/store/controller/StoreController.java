@@ -8,8 +8,10 @@ import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.service.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
@@ -58,7 +61,7 @@ public class StoreController {
         @PathVariable Long storeId
     ) {
         StoreResponseDto storeResponseDto = storeService.findByStoreId(storeId);
-
+        log.info(storeResponseDto.getStoreName());
         return new ResponseEntity<>(storeResponseDto, HttpStatus.OK);
     }
 
