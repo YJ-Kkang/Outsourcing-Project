@@ -11,7 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface OwnerAuthRepository extends JpaRepository<Owner, Long> {
 
+    // 이메일로 전체 사장님 조회
     Optional<Owner> findByEmail(String email);
+
+    // 탈퇴한 사장님은 제외하고 이메일이 일치하는 데이터 조회
+    Optional<Owner> findByEmailAndIsDeleted(String email, int isDeleted);
 
     // Email을 기준으로 isDeleted 값을 업데이트
     @Modifying

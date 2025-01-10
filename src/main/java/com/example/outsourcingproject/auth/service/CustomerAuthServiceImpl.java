@@ -44,8 +44,9 @@ public class CustomerAuthServiceImpl implements CustomerAuthService{
 
     @Override
     public SignInCustomerResponseDto signIn(String email, String rawPassword) {
-        // todo 로그인 상태가 아닌 손님만 들어올 수 있게
-        // todo 탈퇴 유저는 로그인 x
+        // todo 로그인 상태가 아닌 손님만 들어올 수 있게 -> 필터
+
+        // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
         Customer customer = customerAuthRepository.findByEmailAndIsDeleted(email, 0)
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
