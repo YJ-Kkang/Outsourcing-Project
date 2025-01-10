@@ -47,6 +47,7 @@ public class JwtUtil {
         return BEARER_PREFIX +
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자
+                // todo 아이디 저장
                 .claim("auth", authority) // 사용자 역할
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 토큰의 만료시간
                 .setIssuedAt(date) // 토큰 발급 시점

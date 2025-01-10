@@ -1,11 +1,17 @@
 package com.example.outsourcingproject.store.service;
 
+import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
+import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.StoreEntity;
+import com.example.outsourcingproject.exception.CustomException;
+import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
-import java.math.BigInteger;
+import com.example.outsourcingproject.utils.JwtUtil;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +20,29 @@ import org.springframework.stereotype.Service;
 public class StoreServiceImpl implements StoreService {
 
     private final StoreRepository storeRepository;
+    private final OwnerAuthRepository ownerAuthRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
-    public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
+    public CreateStoreResponseDto createStore(
+        CreateStoreRequestDto requestDto,
+        String token
+    ) {
 
         String storeName = requestDto.getStoreName();
         String storeAddress = requestDto.getStoreAddress();
         String storeTelephone = requestDto.getStoreTelephone();
-        BigInteger minimumPurchase = requestDto.getMinimumPurchase();
+        Integer minimumPurchase = requestDto.getMinimumPurchase();
         LocalTime opensAt = requestDto.getOpensAt();
         LocalTime closesAt = requestDto.getClosesAt();
+
+        // jwt 토큰에 저장된 사장님 이메일 추출
+        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+
+        // 사장님 이메일로 사장님 아이디 추출
+        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+        Long ownerId = owner.getId();
 
         // StoreEntity 생성 (가게 정보를 엔티티로 변환)
         StoreEntity store = new StoreEntity();
@@ -35,6 +54,8 @@ public class StoreServiceImpl implements StoreService {
         store.setMinimumPurchase(minimumPurchase);
         store.setOpensAt(opensAt);
         store.setClosesAt(closesAt);
+        store.setId(ownerId);
+
 
         StoreEntity savedStore = storeRepository.save(store);
         // 데이터베이스에 가게 저장
@@ -48,24 +69,35 @@ public class StoreServiceImpl implements StoreService {
             savedStore.getClosesAt());
     }
 
-//    @Override
-//    public List<StoreResponseDto> findAllStores() {
-//
-//        List<StoreEntity> storeEntityList = storeRepository.findAll();
-//
-//        // map을 이용해서 entity 타입을 dto 타입으로 전환시켜줌 (가게 하나 하나의 데이터)
-//        List<StoreResponseDto> responseDtoList = storeEntityList.stream()
-//            .map(StoreResponseDto::convertDto)
-//
-//            // 바뀐 dto들을 다시 List로 만들어줌 (전환시켜준 가게들의 데이터를 한 목록으로 모아주는 작업)
-//            .collect(Collectors.toList());
-//
-//        return responseDtoList;
-//
-//    }
+    // 가게 다건 조회
+    @Override
+    public List<StoreResponseDto> findByStoreNameContaining(String storeName) {
+//        List<StoreEntity> storeEntityList = storeRepository.findByStoreNameContaing(storeName); // %LIKE%
 
-//    @Override
-//    public List<StoreResponseDto> findStoresBySearch(String search) {
-//        storeRepository.findStoresBySearch(search)
-//    }
+//        return storeEntityList.stream()
+//            .map(StoreResponseDto::new)
+//            .collect(Collectors.toList());
+        return null;
+
+    }
+
+    // 가게 단건 조회
+    @Override
+    public StoreResponseDto findByStoreId(Long storeId) {
+        return null;
+    }
+
+    // 가게 수정
+    @Override
+    public StoreResponseDto updateStore(String storeName, String storeAddress,
+        String storeTelephone, Integer minimumPurchase, LocalTime opensAt, LocalTime closesAt) {
+        return null;
+    }
+
+    // 가게 폐업
+    @Override
+    public void deleteStore(Long storeId) {
+
+    }
+
 }

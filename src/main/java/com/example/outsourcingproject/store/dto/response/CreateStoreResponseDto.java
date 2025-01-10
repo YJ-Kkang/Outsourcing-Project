@@ -1,6 +1,5 @@
 package com.example.outsourcingproject.store.dto.response;
 
-import java.math.BigInteger;
 import java.time.LocalTime;
 import lombok.Getter;
 
@@ -11,7 +10,7 @@ public class CreateStoreResponseDto {
   private final String storeName;
   private final String storeAddress;
   private final String storeTelephone;
-  private final BigInteger minimumPurchase;
+  private final Integer minimumPurchase;
   private final LocalTime opensAt;
   private final LocalTime closesAt;
 
@@ -20,7 +19,7 @@ public class CreateStoreResponseDto {
       String storeName,
       String storeAddress,
       String storeTelephone,
-      BigInteger minimumPurchase,
+      Integer minimumPurchase,
       LocalTime opensAt,
       LocalTime closesAt
   ) {

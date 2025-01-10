@@ -4,5 +4,7 @@ import com.example.outsourcingproject.entity.StoreEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreRepository extends JpaRepository<StoreEntity, Long> {
+
+//    List<StoreEntity> findByStoreNameContaing(String storeName);
 }
 

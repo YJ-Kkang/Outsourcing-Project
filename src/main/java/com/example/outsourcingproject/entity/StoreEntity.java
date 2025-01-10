@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.entity;
 
+import com.example.outsourcingproject.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -9,11 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Setter
 @NoArgsConstructor
-public class StoreEntity {
+public class StoreEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,47 +37,42 @@ public class StoreEntity {
     @Column(nullable = false)
     private String storeTelephone;
 
+    //todo @Column 해주기..
     private String storeAddress;
-    private BigInteger minimumPurchase;
+    private Integer minimumPurchase;
     private LocalTime opensAt;
     private LocalTime closesAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private boolean isDeleted;
+    private Integer isDeleted;
     private LocalDateTime deletedAt;
 
 
     public StoreEntity(
-        Long ownerId,
+//        Long ownerId,
         String storeName,
         String storeTelephone,
         String storeAddress,
-        BigInteger minimumPurchase,
+        Integer minimumPurchase,
         LocalTime opensAt,
-        LocalTime closesAt,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        boolean isDeleted,
-        LocalDateTime deletedAt) {
+        LocalTime closesAt) {
 
-        this.ownerId = ownerId;
+//        this.ownerId = ownerId;
         this.storeName = storeName;
         this.storeTelephone = storeTelephone;
         this.storeAddress = storeAddress;
         this.minimumPurchase = minimumPurchase;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.isDeleted = isDeleted;
-        this.deletedAt = deletedAt;
+        this.isDeleted = 0;
+        this.deletedAt = null;
     }
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.isDeleted = false;
+        this.isDeleted = 0;
     }
 
     @PreUpdate
