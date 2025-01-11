@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Optional<Order> findByIdAndOrderStatusNot(
+    Optional<Order> findByIdAndOrderStateNot(
         Long id,
         OrderState status
     );
