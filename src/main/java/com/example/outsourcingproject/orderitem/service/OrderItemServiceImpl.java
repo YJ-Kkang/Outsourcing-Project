@@ -7,7 +7,7 @@ import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.OrderItem;
 import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.orderitem.dto.request.CreateOrderItemRequestDto;
 import com.example.outsourcingproject.orderitem.dto.response.CreateOrderItemResponseDto;
@@ -57,7 +57,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         } // todo 가게 오픈 시간 전이나 종료 시간 후 주문 시 예외 처리
 
         Order orderToSave = new Order(
-            OrderStatus.PENDING,
+            OrderState.PENDING,
             foundStore
         );
 
@@ -139,7 +139,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             foundOrder.getTotalAmountSum(),
             foundOrder.getTotalPriceSum(),
             foundOrder.getId(),
-            foundOrder.getOrderStatus()
+            foundOrder.getOrderState()
         );
     }
 }

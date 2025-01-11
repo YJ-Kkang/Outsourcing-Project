@@ -1,6 +1,8 @@
 package com.example.outsourcingproject.entity;
 
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromAcceptedException;
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromPendingException;
+import com.example.outsourcingproject.order.OrderState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,7 +36,7 @@ public class Order extends BaseEntity {
         name = "order_status",
         nullable = false
     )
-    private OrderStatus orderStatus;
+    private OrderState orderState;
 
     @Comment("주문 총 수량")
     @Column(
@@ -62,10 +64,10 @@ public class Order extends BaseEntity {
     }
 
     public Order(
-        OrderStatus orderStatus,
+        OrderState orderState,
         Store store
     ) {
-        this.orderStatus = orderStatus;
+        this.orderState = orderState;
         this.store = store;
     }
 
@@ -78,39 +80,39 @@ public class Order extends BaseEntity {
     }
 
     // 주문 상태를 변경하는 기능
-    public void updateOrderStatus(OrderStatus orderStatus) {
-        validateStatusSequence(orderStatus);
-        this.orderStatus = orderStatus;
+    public void updateOrderStatus(OrderState orderState) {
+        validateStatusSequence(orderState);
+        this.orderState = orderState;
     }
 
     // 주문 상태 변경 순서가 올바른지 검증하는 기능
-    private void validateStatusSequence(OrderStatus orderStatus) {
+    private void validateStatusSequence(OrderState orderState) {
 
-        boolean isInvalidPendingTransition = !(orderStatus.equals(OrderStatus.ACCEPTED)
-            || orderStatus.equals(OrderStatus.CANCELED));
+        boolean isNotAcceptedOrCanceled = !(orderState.equals(OrderState.ACCEPTED)
+            || orderState.equals(OrderState.CANCELED));
 
-        boolean isInvalidAcceptedTransition = !orderStatus.equals(OrderStatus.DELIVERING);
+        boolean isNotAccepted  = !(orderState.equals(OrderState.ACCEPTED));
 
-        boolean isInvalidDeliveringTransition = !orderStatus.equals(OrderStatus.DELIVERED);
+        boolean isNotDeliveringFromAccepted = !orderState.equals(OrderState.DELIVERING);
 
-        // !accepted이면 예외 던지기
+        boolean isNotDeliveredFromDelivering = !orderState.equals(OrderState.DELIVERED);
 
-        // 끝난다는 걸 명확히 하고자 예외
-        switch (this.orderStatus) {
+
+        switch (this.orderState) {
             case PENDING:
-                if (isInvalidPendingTransition) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT);
-                } // todo
+                if (isNotAcceptedOrCanceled) {
+                    throw new InvalidTransitionFromPendingException();
+                }
                 break;
             case ACCEPTED:
-                if (isInvalidAcceptedTransition) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT);
-                } // todo
+                if (isNotDeliveringFromAccepted) {
+                    throw new InvalidTransitionFromAcceptedException();
+                }
                 break;
             case DELIVERING:
-                if (isInvalidDeliveringTransition) {
+                if (isNotDeliveredFromDelivering) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT);
-                } // todo
+                }
                 break;
         }
     }

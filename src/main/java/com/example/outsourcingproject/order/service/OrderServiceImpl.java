@@ -2,7 +2,9 @@ package com.example.outsourcingproject.order.service;
 
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.Store;
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.dto.request.UpdateOrderRequestDto;
 import com.example.outsourcingproject.order.dto.response.OrderResponseDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
@@ -11,10 +13,8 @@ import com.example.outsourcingproject.store.repository.StoreRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,23 +22,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
-
-    @Transactional
-    @Override
-    public UpdateOrderResponseDto updateOrderStatus(UpdateOrderRequestDto requestDto) {
-        Order foundOrder = orderRepository.findByIdAndOrderStatusNot(
-            requestDto.getId(),
-            OrderStatus.DELIVERED
-        ).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        ); // todo 배달 완료 제외한 주문 조회 및 없을 시 예외 처리
-
-        OrderStatus nextStatus = OrderStatus.of(requestDto.getOrderStatus());
-
-        foundOrder.updateOrderStatus(nextStatus);
-
-        return new UpdateOrderResponseDto(foundOrder.getOrderStatus());
-    }
 
     @Transactional(readOnly = true)
     @Override
@@ -49,15 +32,9 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderResponseDto> responseDtoList = new ArrayList<>();
 
-        responseDtoList = orderList.stream().
-            map(order -> new OrderResponseDto(
-                    order.getStore().getId(),
-                    order.getId(),
-                    order.getTotalAmountSum(),
-                    order.getTotalPriceSum(),
-                    order.getOrderStatus()
-                )
-            ).toList();
+        responseDtoList = orderList.stream()
+            .map(OrderResponseDto::new)
+            .toList();
 
         return responseDtoList;
     }
@@ -67,24 +44,31 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDto> readAllOrdersByStoreId(Long storeId) {
 
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 주문 조회할 때 가게가 없다면 예외 처리
+            .orElseThrow(StoreNotFoundException::new);
 
         List<Order> orderList = orderRepository.findAllByStoreId(foundStore.getId());
 
         List<OrderResponseDto> responseDtoList = new ArrayList<>();
 
         responseDtoList = orderList.stream()
-            .map(order -> new OrderResponseDto(
-                    foundStore.getId(),
-                    order.getId(),
-                    order.getTotalAmountSum(),
-                    order.getTotalPriceSum(),
-                    order.getOrderStatus()
-                )
-            ).toList();
+            .map(OrderResponseDto::new)
+            .toList();
 
         return responseDtoList;
+    }
+
+    @Transactional
+    @Override
+    public UpdateOrderResponseDto updateOrderStatus(UpdateOrderRequestDto requestDto) {
+        Order foundOrder = orderRepository.findByIdAndOrderStateNot(
+            requestDto.getId(),
+            OrderState.DELIVERED
+        ).orElseThrow(OrderNotFoundException::new);
+
+        OrderState nextStatus = OrderState.of(requestDto.getOrderState());
+
+        foundOrder.updateOrderStatus(nextStatus);
+
+        return new UpdateOrderResponseDto(foundOrder.getOrderState());
     }
 }

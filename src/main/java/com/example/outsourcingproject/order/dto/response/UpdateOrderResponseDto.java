@@ -1,15 +1,15 @@
 package com.example.outsourcingproject.order.dto.response;
 
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.order.OrderState;
 import lombok.Getter;
 
 @Getter
 public class UpdateOrderResponseDto {
 
-    private final OrderStatus updatedOrderStatus;
+    private final OrderState updatedOrderState;
 
     public UpdateOrderResponseDto(
-        OrderStatus updatedOrderStatus) {
-        this.updatedOrderStatus = updatedOrderStatus;
+        OrderState updatedOrderState) {
+        this.updatedOrderState = updatedOrderState;
     }
 }
