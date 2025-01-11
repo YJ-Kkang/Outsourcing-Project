@@ -6,6 +6,7 @@ import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 
 public interface OwnerAuthService {
+
     SignUpOwnerResponseDto signUp(SignUpOwnerRequestDto requestDto);
 
     SignInOwnerResponseDto signIn(SignInOwnerRequestDto requestDto);
