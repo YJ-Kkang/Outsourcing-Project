@@ -11,7 +11,6 @@ import com.example.outsourcingproject.review.dto.request.CreateReviewRequestDto;
 import com.example.outsourcingproject.review.dto.response.CreateReviewResponseDto;
 import com.example.outsourcingproject.review.dto.response.FindReviewResponseDto;
 import com.example.outsourcingproject.review.repository.ReviewRepository;
-import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,8 +40,8 @@ public class ReviewServiceImpl{
         Order findorder = orderRepository
             .findById(orderId)
             .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND) // todo 오더 배송완료 어떻게 되는지 알아보기
-            ); // todo 오더 식별자로 주문 조회했을 때 주문이 없으면 예외 처리
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)// todo 오더 식별자로 주문 조회했을 때 주문이 없으면 예외 처리
+            );
 
         // 주문 상태가 배송 완료일 경우에만 리뷰를 쓸 수 있도록 예외처리
         boolean isNotDeliverd = !findorder
@@ -51,7 +50,7 @@ public class ReviewServiceImpl{
             );
 
         if (isNotDeliverd) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND); // todo OrderStatus가 배송완료 아닌 경우 예외 처리
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN); // todo OrderStatus가 배송완료 아닌 경우 예외 처리
         }
 
         // 가게 정보 가져오기
@@ -63,8 +62,8 @@ public class ReviewServiceImpl{
         // 손님 이메일로 손님 아이디 추출
         Customer findCustomer = customerAuthRepository
             .findByEmail(customerEmail)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 손님 이메일로 찾을 수 있는 아이디 없으면 예외 처리
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND) // todo 손님 이메일로 찾을 수 있는 아이디 없으면 예외 처리
+            );
 
         // Dto에서 리뷰 내용 가져오고, 리뷰 엔티티 만들어주기(엔티티 == 테이블)
         Review reviewToSave = new Review(
@@ -90,19 +89,38 @@ public class ReviewServiceImpl{
         );
     }
 
-    public List<FindReviewResponseDto> findAllReviewService(Long storeId) {
-        // DB에서 가져오기
-        List<Review> reviewList = reviewRepository
-            .findByStoreId(storeId);
+    public List<FindReviewResponseDto> findAllReviewService(
+        Long storeId,
+        String sort,
+        Integer startRating,
+        Integer endRating
+    ) {
+        // 별점 필터링 조건 처리
+        List<Review> reviewList = new ArrayList<>();
+        if (startRating != null && endRating != null) {
+            // 별점 범위 지정된 경우
+            reviewList = reviewRepository.findByStoreIdAndRatingBetween(storeId, startRating, endRating);
+        }
 
-        // dtoList로 변환하기 위해 선언
+        // 정렬 조건 적용
+        if ("latest".equals(sort)) {
+            // 최신순 정렬
+            reviewList.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
+        } else if ("oldest".equals(sort)) {
+            // 오래된순 정렬
+            reviewList.sort((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
+        }
+
+        // Review 엔티티를 DTO로 변환
         List<FindReviewResponseDto> findReviewResponseDtoList = new ArrayList<>();
-
-        // reviewList 모두 돌면서 새로운 findReviewResponseDtoList에 추가
-        // reviewList를 findReviewResponseDtoList로 변환
         for (Review review : reviewList) {
             FindReviewResponseDto findReviewResponseDto = new FindReviewResponseDto(review);
             findReviewResponseDtoList.add(findReviewResponseDto);
+        }
+
+        // 해당 가게에 리뷰가 존재하지 않을 경우 예외처리
+        if (findReviewResponseDtoList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND); // todo 해당 가게에 대한 리뷰가 없을 경우 예외처리
         }
 
         return findReviewResponseDtoList;

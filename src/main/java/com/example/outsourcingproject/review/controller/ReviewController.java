@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,7 +26,7 @@ public class ReviewController {
     }
 
     @PostMapping("/orders/{orderId}/reviews")
-    public ResponseEntity<CreateReviewResponseDto> createReviewAPI(
+    public ResponseEntity<CreateReviewResponseDto> createReview(
         @PathVariable("orderId") Long orderId,
         @Valid @RequestBody CreateReviewRequestDto requestDto,
         @RequestHeader("Authorization") String token //todo @Valid 유효성 검사
@@ -38,15 +39,22 @@ public class ReviewController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    // 리뷰 다건 조회(가게 정보 기준, 최신순 정렬)
-    // 리뷰 별점 범위에 따라 조회 가능
+    // 리뷰 다건 조회(가게 정보 기준, 최신순 정렬 및 별점 범위 필터링 기능)
     @GetMapping("/stores/{storeId}/reviews")
-    public List<FindReviewResponseDto> findAllReview(
-        @PathVariable("storeId") Long storeId
-        // 쿼리파람 값 컨트롤러에서 받아서 서비스에서 그 값 받아서 해결하기.(별점 범위, 최신순 정렬)
-        ) {
-    List<FindReviewResponseDto> findAllFindReviewResponseDtoList = reviewServiceImpl.findAllReviewService(storeId);
-    return findAllFindReviewResponseDtoList;
+    public ResponseEntity<List<FindReviewResponseDto>> findAllReview(
+        @PathVariable("storeId") Long storeId,
+        @RequestParam(value = "sort", required = false, defaultValue = "latest") String sort,
+        @RequestParam(value = "startRating", required = false) Integer startRating,
+        @RequestParam(value = "endRating", required = false) Integer endRating
+    ) {
+        List<FindReviewResponseDto> findReviewResponseDtoList = reviewServiceImpl
+            .findAllReviewService(
+                storeId,
+                sort,
+                startRating,
+                endRating);
+
+        return new ResponseEntity<>(findReviewResponseDtoList, HttpStatus.OK);
     }
 
 }
