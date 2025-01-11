@@ -4,17 +4,21 @@ import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.CustomException;
+import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.exception.notfound.OwnerNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
+import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import java.time.LocalTime;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -109,15 +113,56 @@ public class StoreServiceImpl implements StoreService {
 
     // 가게 수정
     @Override
-    public StoreResponseDto updateStore(String storeName, String storeAddress,
-        String storeTelephone, Integer minimumPurchase, LocalTime opensAt, LocalTime closesAt) {
-        return null;
+    public UpdateStoreResponseDto updateStore(
+        Long id,
+        UpdateStoreRequestDto requestDto
+    ) {
+
+        Store foundStore = storeRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다."));
+
+        foundStore.update(
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt()
+        );
+
+        storeRepository.save(foundStore);
+
+        return new UpdateStoreResponseDto(
+            foundStore.getId(),
+            foundStore.getStoreName(),
+            foundStore.getStoreAddress(),
+            foundStore.getStoreTelephone(),
+            foundStore.getMinimumPurchase(),
+            foundStore.getOpensAt(),
+            foundStore.getClosesAt()
+        );
     }
+
 
     // 가게 폐업
     @Override
-    public void deleteStore(Long storeId) {
+    @Transactional
+    public void deleteStore(Long storeId, String token) {
 
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        /**
+         * 토큰으로 권한 인증을 받은 사장님과 경로를 통해 값을 받아서 그 상점의 사장님과 같은지 검증로직
+         */
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
+        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+
+        if (!(owner.getId().equals(store.getOwnerId()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        storeRepository.delete(store);
     }
 
 }
