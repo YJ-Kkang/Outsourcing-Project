@@ -10,12 +10,16 @@ import jakarta.persistence.Table;
 import java.time.LocalTime;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "stores")
 @Getter
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE stores SET is_deleted = true WHERE id = ?")
 public class Store extends BaseEntity {
 
     @Comment("가게 식별자")
@@ -69,6 +73,9 @@ public class Store extends BaseEntity {
     )
     private LocalTime closesAt;
 
+    @Column(insertable=false, updatable=false)
+    private final boolean is_deleted = Boolean.FALSE;
+
     protected Store() {
     }
 
@@ -89,4 +96,21 @@ public class Store extends BaseEntity {
         this.opensAt = opensAt;
         this.closesAt = closesAt;
     }
+
+    public void update(
+        String storeName,
+        String storeAddress,
+        String storeTelephone,
+        Integer minimumPurchase,
+        LocalTime opensAt,
+        LocalTime closesAt
+    ) {
+        this.storeName = storeName;
+        this.storeAddress = storeAddress;
+        this.storeTelephone = storeTelephone;
+        this.minimumPurchase = minimumPurchase;
+        this.opensAt = opensAt;
+        this.closesAt = closesAt;
+    }
+
 }

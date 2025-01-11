@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
-public class StoreUpdateRequestDto {
+public class UpdateStoreRequestDto {
 
     private final String storeName;
     private final String storeAddress;
@@ -13,7 +13,7 @@ public class StoreUpdateRequestDto {
     private final LocalTime opensAt;
     private final LocalTime closesAt;
 
-    public StoreUpdateRequestDto(
+    public UpdateStoreRequestDto(
         String storeName,
         String storeAddress,
         String storeTelephone,
@@ -28,5 +28,5 @@ public class StoreUpdateRequestDto {
         this.opensAt = opensAt;
         this.closesAt = closesAt;
     }
-
 }
+
