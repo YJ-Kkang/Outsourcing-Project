@@ -1,30 +1,22 @@
 package com.example.outsourcingproject.aspect;
 
-import com.example.outsourcingproject.entity.Order;
-import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionException;
 import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.dto.request.UpdateOrderRequestDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
-import com.example.outsourcingproject.order.repository.OrderRepository;
 import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Aspect
 @Component
 public class OrderAspect {
 
-    // todo 리팩토링 할 때는 의존하지 말고 써보자 (+) 쓰레드 로컬)
-    private final OrderRepository orderRepository;
-
-    public OrderAspect(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-
-    // 어노테이션을 하나 만들어서 해당 포인트 컷에 어노테이션을 달아주는 방법도 있다. (현업에서는 이렇게 쓴다, 현재는 패키지 기반이다.)
     @Pointcut("execution(* com.example.outsourcingproject.order.service.OrderServiceImpl.updateOrderStatus(..))")
     public void trackOrderServiceMethods() {
     }
@@ -35,30 +27,34 @@ public class OrderAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
-        System.out.println(methodName + " method starts");
+        log.info("{} method starts", methodName);
+
         UpdateOrderRequestDto requestDto = (UpdateOrderRequestDto) args[0];
-        Long orderId  = requestDto.getId();
+        Long orderId = requestDto.getId();
 
-        // todo try catch 문으로 잡아주자 + 예외 던지는 건 서비스에서 하니까 서비스에서 하게 두자
-        Order foundOrder = orderRepository.findById(orderId)
-                .orElseThrow(OrderNotFoundException::new);
+        Object result = null;
 
-        Long storeId = foundOrder.getStore().getId();
-        OrderState currentOrderState = foundOrder.getOrderState();
-        LocalDateTime orderRequestTime = foundOrder.getCreatedAt();
-
-        System.out.println("Order ID: " + orderId);
-        System.out.println("Store ID: " + storeId);
-        System.out.println("Current Order State: " + currentOrderState);
-
-        Object result = joinPoint.proceed();
-
+        try {
+            result = joinPoint.proceed();
+        } catch (InvalidTransitionException ex) {
+            log.error(
+                "Invalid Transition Exception occurred while executing method {} with Order ID: {}",
+                methodName,
+                orderId,
+                ex
+            );
+            throw ex;
+        }
         UpdateOrderResponseDto responseDto = (UpdateOrderResponseDto) result;
-        OrderState updatedOrderState = responseDto.getUpdatedOrderState();
 
-        System.out.println("Order Request Time: " + orderRequestTime);
-        System.out.println("Updated Order State: " + updatedOrderState);
-        System.out.println("Log: Order status has changed from " + currentOrderState + " to " + updatedOrderState);
+        Long storeId = responseDto.getStoreId();
+        OrderState updatedOrderState = responseDto.getUpdatedOrderState();
+        LocalDateTime now = LocalDateTime.now();
+
+        log.info("Order ID: {}", orderId);
+        log.info("Store ID: {}", storeId);
+        log.info("Updated Order State: {}", updatedOrderState);
+        log.info("Updated Date and Time: {}", now);
 
         return result;
     }
