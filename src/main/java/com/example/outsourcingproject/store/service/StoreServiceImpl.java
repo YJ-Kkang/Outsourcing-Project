@@ -1,11 +1,15 @@
 package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
+import com.example.outsourcingproject.category.repository.CategoryRepository;
+import com.example.outsourcingproject.entity.Category;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
+import com.example.outsourcingproject.exception.badrequest.CategoryInvalidCountException;
+import com.example.outsourcingproject.exception.badrequest.StoreInvalidCountExcessException;
 import com.example.outsourcingproject.exception.notfound.OwnerNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
@@ -18,10 +22,10 @@ import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,7 @@ public class StoreServiceImpl implements StoreService {
     private final OwnerAuthRepository ownerAuthRepository;
     private final JwtUtil jwtUtil;
     private final MenuRepository menuRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     @Override
@@ -50,8 +55,23 @@ public class StoreServiceImpl implements StoreService {
         Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
 
         if (storeCount >= 3) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        } // todo 사장님의 가게 수가 최대 3개이므로 4개째부터 예외 발생
+            throw new StoreInvalidCountExcessException();
+        }
+
+        List<String> categoryNameList = new ArrayList<>();
+
+        categoryNameList = requestDto.getCategoryNameList();
+
+        if (categoryNameList.size() != 2) {
+            throw new CategoryInvalidCountException();
+        }
+
+        List<Category> categoryList = new ArrayList<>();
+
+        categoryList = categoryRepository.findAllByNameIn(
+            categoryNameList,
+            Sort.unsorted()
+        );
 
         Store storeToSave = new Store(
             foundOwner.getId(),
@@ -60,7 +80,9 @@ public class StoreServiceImpl implements StoreService {
             requestDto.getStoreTelephone(),
             requestDto.getMinimumPurchase(),
             requestDto.getOpensAt(),
-            requestDto.getClosesAt()
+            requestDto.getClosesAt(),
+            categoryList.get(0),
+            categoryList.get(1)
         );
 
         Store savedStore = storeRepository.save(storeToSave);
@@ -74,7 +96,10 @@ public class StoreServiceImpl implements StoreService {
 
         List<Store> storeList = new ArrayList<>();
 
-        storeList = storeRepository.findByStoreNameContainingAndIsDeleted(storeName, 0);
+        storeList = storeRepository.findByStoreNameContainingAndIsDeleted(
+            storeName,
+            0
+        );
 
         List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
 
@@ -96,7 +121,10 @@ public class StoreServiceImpl implements StoreService {
 
         List<Menu> menuList = new ArrayList<>();
 
-        menuList = menuRepository.findAllByStoreIdAndIsDeleted(foundStore.getId(), 0);
+        menuList = menuRepository.findAllByStoreIdAndIsDeleted(
+            foundStore.getId(),
+            0
+        );
 
         List<MenuDto> menuDtoList = new ArrayList<>();
 
@@ -111,15 +139,13 @@ public class StoreServiceImpl implements StoreService {
         );
     }
 
-    // 가게 수정
     @Override
     public UpdateStoreResponseDto updateStore(
-        Long id,
+        Long storeId,
         UpdateStoreRequestDto requestDto
     ) {
-
-        Store foundStore = storeRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다."));
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
 
         foundStore.update(
             requestDto.getStoreName(),
@@ -132,37 +158,29 @@ public class StoreServiceImpl implements StoreService {
 
         storeRepository.save(foundStore);
 
-        return new UpdateStoreResponseDto(
-            foundStore.getId(),
-            foundStore.getStoreName(),
-            foundStore.getStoreAddress(),
-            foundStore.getStoreTelephone(),
-            foundStore.getMinimumPurchase(),
-            foundStore.getOpensAt(),
-            foundStore.getClosesAt()
-        );
+        return new UpdateStoreResponseDto(foundStore);
     }
 
-
-    // 가게 폐업
     @Override
     @Transactional
     public void deleteStore(Long storeId, String token) {
-
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         /**
          * 토큰으로 권한 인증을 받은 사장님과 경로를 통해 값을 받아서 그 상점의 사장님과 같은지 검증로직
          */
         String ownerEmail = jwtUtil.extractOwnerEmail(token);
-        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
+
+        Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
-        if (!(owner.getId().equals(store.getOwnerId()))) {
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
+
+        boolean isIdMismatching = !(foundOwner.getId().equals(foundStore.getOwnerId()));
+
+        if (isIdMismatching) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        storeRepository.delete(store);
+        foundStore.markAsDeleted();
     }
-
 }
