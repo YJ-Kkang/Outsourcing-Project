@@ -2,30 +2,30 @@ package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
-import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import java.time.LocalTime;
 import java.util.List;
 
 public interface StoreService {
 
-   CreateStoreResponseDto createStore(
-       CreateStoreRequestDto requestDto,
-       String token
-   );
+    CreateStoreResponseDto createStore(
+        CreateStoreRequestDto requestDto,
+        String token
+    );
 
-   List<StoreNameResponseDto> findByStoreNameContaining(String storeName);
+    List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName);
 
-   StoreResponseDto findByStoreId(Long storeId);
+    StoreResponseDto findStoreByStoreId(Long storeId);
 
-   StoreResponseDto updateStore(
-       String storeName,
-       String storeAddress,
-       String storeTelephone,
-       Integer minimumPurchase,
-       LocalTime opensAt,
-       LocalTime closesAt
-   );
+    StoreResponseDto updateStore(
+        String storeName,
+        String storeAddress,
+        String storeTelephone,
+        Integer minimumPurchase,
+        LocalTime opensAt,
+        LocalTime closesAt
+    );
 
-   void deleteStore(Long storeId);
+    void deleteStore(Long storeId);
 }

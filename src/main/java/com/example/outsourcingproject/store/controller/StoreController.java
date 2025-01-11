@@ -1,18 +1,17 @@
 package com.example.outsourcingproject.store.controller;
 
-import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
-import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.service.StoreService;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,38 +31,41 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    // 가게 생성
     @PostMapping
     public ResponseEntity<CreateStoreResponseDto> createStore(
         @RequestBody CreateStoreRequestDto requestDto,
         @RequestHeader("Authorization") String token) { //todo @Valid 유효성 검사
 
-        CreateStoreResponseDto createStoreResponseDto = storeService.createStore(
+        CreateStoreResponseDto responseDto = storeService.createStore(
             requestDto,
             token
         );
 
-        return new ResponseEntity<>(createStoreResponseDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    // 가게 다건 조회 : entity에서 dto로 변환
     @GetMapping
-    public ResponseEntity<List<StoreNameResponseDto>> findAllStore(
+    public ResponseEntity<List<StoreNameSearchResponseDto>> readAllStores(
         @RequestParam String search
     ) {
-        List<StoreNameResponseDto> storeResponseDtoList = storeService.findByStoreNameContaining(search);
-        log.info("findAllStore:{}", storeResponseDtoList);
-        return new ResponseEntity<>(storeResponseDtoList, HttpStatus.OK);
+        List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList = storeService.readAllStoresByStoreName(search);
+
+        log.info("findAllStore:{}", responseDtoList);
+
+        return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
-    // 가게 단건 조회
     @GetMapping("/{storeId}")
-    public ResponseEntity<StoreResponseDto> findByStoreId(
-        @PathVariable Long storeId
+    public ResponseEntity<StoreResponseDto> readOneStore(
+        @PathVariable("storeId") Long storeId
     ) {
-        StoreResponseDto storeResponseDto = storeService.findByStoreId(storeId);
-        log.info(storeResponseDto.getStoreName());
-        return new ResponseEntity<>(storeResponseDto, HttpStatus.OK);
+        StoreResponseDto responseDto = storeService.findStoreByStoreId(storeId);
+
+        log.info(responseDto.getStoreName());
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 가게 수정
@@ -89,7 +91,7 @@ public class StoreController {
     public ResponseEntity<Void> deleteStore(
         @PathVariable Long storeId
         //todo 폐업시 비밀번호 확인?
-    ){
+    ) {
         storeService.deleteStore(storeId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -4,22 +4,24 @@ import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
-import com.example.outsourcingproject.exception.CustomException;
-import com.example.outsourcingproject.exception.ErrorCode;
+import com.example.outsourcingproject.exception.notfound.OwnerNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
-import com.example.outsourcingproject.store.dto.response.StoreNameResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,99 +32,77 @@ public class StoreServiceImpl implements StoreService {
     private final JwtUtil jwtUtil;
     private final MenuRepository menuRepository;
 
+    @Transactional
     @Override
     public CreateStoreResponseDto createStore(
         CreateStoreRequestDto requestDto,
         String token
     ) {
-        String storeName = requestDto.getStoreName();
-        String storeAddress = requestDto.getStoreAddress();
-        String storeTelephone = requestDto.getStoreTelephone();
-        Integer minimumPurchase = requestDto.getMinimumPurchase();
-        LocalTime opensAt = requestDto.getOpensAt();
-        LocalTime closesAt = requestDto.getClosesAt();
-
-        // jwt 토큰에 저장된 사장님 이메일 추출
         String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // 사장님 이메일로 사장님 아이디 추출
-        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
-        Long ownerId = owner.getId();
+        Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(OwnerNotFoundException::new);
 
-        // StoreEntity 생성 (가게 정보를 엔티티로 변환)
-        Store store = new Store(
-            ownerId, storeName, storeAddress, storeTelephone,
-            minimumPurchase, opensAt, closesAt
+        Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
+
+        if (storeCount >= 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        } // todo 사장님의 가게 수가 최대 3개이므로 4개째부터 예외 발생
+
+        Store storeToSave = new Store(
+            foundOwner.getId(),
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt()
         );
 
-        // 데이터베이스에 가게 저장
-        Store savedStore = storeRepository.save(store);
+        Store savedStore = storeRepository.save(storeToSave);
 
-        return new CreateStoreResponseDto(
-            savedStore.getId(),
-            savedStore.getStoreName(),
-            savedStore.getStoreAddress(),
-            savedStore.getStoreTelephone(),
-            savedStore.getMinimumPurchase(),
-            savedStore.getOpensAt(),
-            savedStore.getClosesAt());
+        return new CreateStoreResponseDto(savedStore);
     }
 
-    // 가게 다건 조회 : <store>을 <dto>로 변환
+    @Transactional(readOnly = true)
     @Override
-    public List<StoreNameResponseDto> findByStoreNameContaining(String storeName) {
+    public List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName) {
 
-        List<Store> storeNameList = storeRepository.findByStoreNameContaining(storeName);
+        List<Store> storeList = new ArrayList<>();
 
-        List<StoreNameResponseDto> storeNameResponseDtoList = new ArrayList<>();
+        storeList = storeRepository.findByStoreNameContainingAndIsDeleted(storeName, 0);
 
-        for (Store store : storeNameList) {
-            StoreNameResponseDto storeResponseDto = new StoreNameResponseDto(
-                store.getStoreName(),
-                store.getStoreAddress(),
-                store.getStoreTelephone(),
-                store.getMinimumPurchase(),
-                store.getOpensAt(),
-                store.getClosesAt()
-            );
+        List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
 
-            storeNameResponseDtoList.add(storeResponseDto);
+        for (Store foundStore : storeList) {
+            StoreNameSearchResponseDto responseDto = new StoreNameSearchResponseDto(foundStore);
+
+            responseDtoList.add(responseDto);
         }
 
-        return storeNameResponseDtoList;
+        return responseDtoList;
     }
 
-
-    // 가게 및 해당 가게 메뉴 조회
+    @Transactional(readOnly = true)
     @Override
-    public StoreResponseDto findByStoreId(Long storeId) {
+    public StoreResponseDto findStoreByStoreId(Long storeId) {
 
-        Store store = storeRepository.findById(storeId)
-            .orElseThrow(() -> new EntityNotFoundException("가게를 찾을 수 없습니다.")); // todo 예외치리
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
 
-        //1. 메뉴리스트 가져오기 (객체메뉴 생성
-        List<Menu> menuList = menuRepository.findAllByStoreId(store.getId());
-        //2. 메뉴dto가 들어 있는 리스트 선언
+        List<Menu> menuList = new ArrayList<>();
+
+        menuList = menuRepository.findAllByStoreIdAndIsDeleted(foundStore.getId(), 0);
+
         List<MenuDto> menuDtoList = new ArrayList<>();
-        //3. 변환하기 (타입이 다르므로 Menu를 menuList에서 ‘하나씩’ 꺼내서 MenuDto 타입으로 변환한 다음에, menuDtoList에 넣기 ‘반복’
 
-        for (Menu menu : menuList) {
-            MenuDto menuDto = new MenuDto(
-                menu.getId(),
-                menu.getMenuName(),
-                menu.getMenuPrice(),
-                menu.getMenuInfo());
+        for (Menu foundMenu : menuList) {
+            MenuDto menuDto = new MenuDto(foundMenu);
             menuDtoList.add(menuDto);
         }
 
         return new StoreResponseDto(
-            store.getStoreName(),
-            store.getStoreAddress(),
-            store.getStoreTelephone(),
-            store.getMinimumPurchase(),
-            store.getOpensAt(),
-            store.getClosesAt(),
+            foundStore,
             menuDtoList
         );
     }

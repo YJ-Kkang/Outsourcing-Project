@@ -9,39 +9,46 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.Getter;
+import org.hibernate.annotations.Comment;
 
 @Getter
 @Entity
-//@SoftDelete //todo 일단 어노테이션으로 실험
 @Table(name = "customers")
 public class Customer extends BaseEntity {
 
+    @Comment("손님 식별자")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    @Column(nullable = false)
+    @Comment("손님 이메일")
+    @Column(
+        name = "email",
+        nullable = false
+    )
     private String email;
 
-    @Column(nullable = false)
+    @Comment("손님 비밀번호")
+    @Column(
+        name = "password",
+        nullable = false
+    )
     private String password;
 
     // Customer 테이블에 저장된 데이터의 authority는 무조건 손님
     // 사장으로 권한 수정? -> 손님 데이터 삭제 (탈퇴) 후 사장님 테이블에 데이터 생성 (회원가입) 하기
+    @Comment("손님 권한")
     @Enumerated(EnumType.STRING)
-    @Column(updatable = false, nullable = false)
+    @Column(
+        name = "authority",
+        updatable = false,
+        nullable = false
+    )
     private Authority authority;
 
-//     todo @softdelete 어노테이션을 쓸거면 지우기
-    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private Integer isDeleted;
-
-    @Column
-    private LocalDateTime deletedAt;
-
-    public Customer() {
+    protected Customer() {
     }
 
     public Customer(
@@ -51,7 +58,5 @@ public class Customer extends BaseEntity {
         this.email = email;
         this.password = password;
         this.authority = Authority.CUSTOMER;
-        this.isDeleted = 0;
-        this.deletedAt = null;
     }
 }

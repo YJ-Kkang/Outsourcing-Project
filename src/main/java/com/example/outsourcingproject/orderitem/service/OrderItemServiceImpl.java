@@ -67,31 +67,23 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         responseDtoList = requestDtoList.stream()
             .map(requestDto -> {
+                Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
+                    .orElseThrow(
+                        () -> new ResponseStatusException(
+                            HttpStatus.NOT_FOUND
+                        )
+                    ); // todo 메뉴가 없을 시 예외 처리
 
-                    Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
-                        .orElseThrow(
-                            () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND
-                            )
-                        ); // todo 메뉴가 없을 시 예외 처리
+                OrderItem orderItemToSave = new OrderItem(
+                    savedOrder,
+                    foundMenu,
+                    requestDto.getEachAmount()
+                );
 
-                    OrderItem orderItemToSave = new OrderItem(
-                        savedOrder,
-                        foundMenu,
-                        requestDto.getEachAmount()
-                    );
+                OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
 
-                    OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
-
-                    return new CreateOrderItemResponseDto(
-                        savedOrderItem.getId(),
-                        foundMenu.getId(),
-                        savedOrderItem.getEachAmount(),
-                        foundMenu.getMenuPrice(),
-                        savedOrderItem.getTotalPrice()
-                    );
-                }
-            ).toList();
+                return new CreateOrderItemResponseDto(savedOrderItem);
+            }).toList();
 
         Integer totalPriceSum = responseDtoList.stream()
             .mapToInt(CreateOrderItemResponseDto::getTotalPrice)
@@ -108,14 +100,14 @@ public class OrderItemServiceImpl implements OrderItemService {
             .sum();
 
         savedOrder.updateTotals(totalAmountSum, totalPriceSum);
+
         orderRepository.save(savedOrder);
 
         return new CreateOrderItemWrapper(
             responseDtoList,
             totalAmountSum,
             totalPriceSum,
-            savedOrder.getId(),
-            savedOrder.getOrderStatus()
+            savedOrder
         );
     }
 

@@ -16,8 +16,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    // 주문 생성일
-    // 다른 생성일과 함께 쓸 수 있도록 '생성일'이라고 지음
     @Comment("생성일")
     @CreatedDate
     @ColumnDefault("CURRENT_TIMESTAMP")
@@ -29,8 +27,6 @@ public abstract class BaseEntity {
     )
     private LocalDateTime createdAt;
 
-    // 주문 상태 변경일
-    // 다른 생성일과 함께 쓸 수 있도록 '생성일'이라고 지음
     @Comment("수정일")
     @LastModifiedDate
     @Column(
@@ -40,9 +36,12 @@ public abstract class BaseEntity {
     )
     private LocalDateTime updatedAt;
 
-
-    protected BaseEntity() {
-    }
+    @Comment("삭제 여부")
+    @Column(
+        name = "is_deleted",
+        columnDefinition = "TINYINT(1) DEFAULT 0"
+    )
+    private Integer isDeleted = 0;
 
     @Comment("삭제일")
     @Column(
@@ -51,9 +50,11 @@ public abstract class BaseEntity {
     )
     private LocalDateTime deletedAt;
 
-    // todo 각 엔티티에 있는 논리 삭제 속성 전부 다 하나로 맞춰야 함
-    // 소프트 딜리트 (논리 삭제) 기능
+    protected BaseEntity() {
+    }
+
     public void markAsDeleted() {
-        this.deletedAt = LocalDateTime.now(); // 현재 시간으로 삭제일 설정
+        this.isDeleted = 1;
+        this.deletedAt = LocalDateTime.now();
     }
 }

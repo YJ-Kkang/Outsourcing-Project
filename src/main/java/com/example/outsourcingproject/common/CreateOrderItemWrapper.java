@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.common;
 
+import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.order.OrderStatus;
 import com.example.outsourcingproject.orderitem.dto.response.CreateOrderItemResponseDto;
 import java.util.List;
@@ -18,13 +19,12 @@ public class CreateOrderItemWrapper {
         List<CreateOrderItemResponseDto> orderDetails,
         Integer totalAmountSum,
         Integer totalPriceSum,
-        Long orderId,
-        OrderStatus orderStatus
+        Order order
     ) {
         this.orderDetails = orderDetails;
         this.totalAmountSum = totalAmountSum;
         this.totalPriceSum = totalPriceSum;
-        this.orderId = orderId;
-        this.orderStatus = orderStatus;
+        this.orderId = order.getId();
+        this.orderStatus = order.getOrderStatus();
     }
 }

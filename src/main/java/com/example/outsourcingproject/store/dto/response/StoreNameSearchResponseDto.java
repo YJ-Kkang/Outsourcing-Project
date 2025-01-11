@@ -1,13 +1,13 @@
 package com.example.outsourcingproject.store.dto.response;
 
+
 import com.example.outsourcingproject.entity.Store;
 import java.time.LocalTime;
 import lombok.Getter;
 
 @Getter
-public class CreateStoreResponseDto {
+public class StoreNameSearchResponseDto {
 
-    private final Long id;
     private final String storeName;
     private final String storeAddress;
     private final String storeTelephone;
@@ -15,8 +15,7 @@ public class CreateStoreResponseDto {
     private final LocalTime opensAt;
     private final LocalTime closesAt;
 
-    public CreateStoreResponseDto(Store store) {
-        this.id = store.getId();
+    public StoreNameSearchResponseDto(Store store) {
         this.storeName = store.getStoreName();
         this.storeAddress = store.getStoreAddress();
         this.storeTelephone = store.getStoreTelephone();

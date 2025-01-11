@@ -5,6 +5,7 @@ import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,37 +19,29 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping
-public class CustomerAuthController { //todo 생성자 어노테이션으로
+@RequiredArgsConstructor
+public class CustomerAuthController {
 
     private final CustomerAuthServiceImpl customerAuthService;
 
-    public CustomerAuthController(CustomerAuthServiceImpl customerAuthService) {
-        this.customerAuthService = customerAuthService;
-    }
-
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
-    public ResponseEntity<SignUpCustomerResponseDto> signUp(
+    public ResponseEntity<SignUpCustomerResponseDto> signUpCustomer(
         @RequestBody SignUpCustomerRequestDto requestDto
     ) {
-        SignUpCustomerResponseDto responseDto = customerAuthService.signUp(
-            requestDto.getEmail(),
-            requestDto.getPassword()
-        );
+        SignUpCustomerResponseDto responseDto = customerAuthService.signUp(requestDto);
+
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     // 손님 로그인
     @PostMapping("/auth/sign-in/customers")
-    public ResponseEntity<SignInCustomerResponseDto> signIn(
+    public ResponseEntity<SignInCustomerResponseDto> signInCustomer(
         @RequestBody SignInCustomerRequestDto requestDto
     ) {
-        SignInCustomerResponseDto signInCustomerResponseDto = customerAuthService.signIn(
-            requestDto.getEmail(),
-            requestDto.getPassword()
-        );
+        SignInCustomerResponseDto responseDto = customerAuthService.signIn(requestDto);
 
-        return new ResponseEntity<>(signInCustomerResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 손님 탈퇴
