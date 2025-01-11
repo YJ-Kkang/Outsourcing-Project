@@ -13,8 +13,6 @@ import jakarta.persistence.Table;
 import java.time.LocalTime;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -88,7 +86,7 @@ public class Store extends BaseEntity {
     private Category categoryTwo;
 
     @Column(
-        insertable=false, updatable=false
+        insertable = false, updatable = false
     )
     private final boolean is_deleted = Boolean.FALSE;
 
