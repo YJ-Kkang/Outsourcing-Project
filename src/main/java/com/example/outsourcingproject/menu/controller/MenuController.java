@@ -5,7 +5,6 @@ import com.example.outsourcingproject.menu.dto.request.UpdateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.response.CreateMenuResponseDto;
 import com.example.outsourcingproject.menu.dto.response.UpdateMenuResponseDto;
 import com.example.outsourcingproject.menu.service.MenuService;
-import com.example.outsourcingproject.menu.service.MenuServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
