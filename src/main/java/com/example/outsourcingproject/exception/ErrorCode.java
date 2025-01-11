@@ -16,6 +16,7 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "ERR008", "접근 권한이 없습니다."),
     EMAIL_EXIST(HttpStatus.BAD_REQUEST, "ERR009", "이미 존재하거나 탈퇴한 이메일입니다.");
 
+
     private final HttpStatus status;
     private final String code;
     private final String message;
