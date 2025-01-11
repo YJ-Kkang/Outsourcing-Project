@@ -39,7 +39,8 @@ public class OrderItemController {
     public ResponseEntity<ReadOrderItemWrapper> readAllOrderItems(
         @PathVariable("orderId") Long orderId
     ) {
-        ReadOrderItemWrapper responseDtoWrapper = orderItemService.readAllOrderItemsByOrderId(orderId);
+        ReadOrderItemWrapper responseDtoWrapper = orderItemService.readAllOrderItemsByOrderId(
+            orderId);
 
         return new ResponseEntity<>(responseDtoWrapper, HttpStatus.OK);
     }
