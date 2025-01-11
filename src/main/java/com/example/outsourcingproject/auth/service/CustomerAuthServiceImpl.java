@@ -76,7 +76,10 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
             foundCustomer.getAuthority()
         );
 
-        return new SignInCustomerResponseDto(token);
+        // 앞의 7글자 ('Bearer ')를 제외한 실제 토큰 부분만 추출
+        String actualToken = token.substring(7);
+
+        return new SignInCustomerResponseDto(actualToken);
     }
 
     @AuthCheck("CUSTOMER")
