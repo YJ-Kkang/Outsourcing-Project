@@ -27,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class ReviewServiceImpl{
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
-    private final StoreRepository storeRepository;
     private final CustomerAuthRepository customerAuthRepository;
     private final JwtUtil jwtUtil;
 
@@ -42,7 +41,7 @@ public class ReviewServiceImpl{
         Order findorder = orderRepository
             .findById(orderId)
             .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND) // todo 오더 배송완료 어떻게 되는지 알아보기
             ); // todo 오더 식별자로 주문 조회했을 때 주문이 없으면 예외 처리
 
         // 주문 상태가 배송 완료일 경우에만 리뷰를 쓸 수 있도록 예외처리
@@ -91,10 +90,10 @@ public class ReviewServiceImpl{
         );
     }
 
-    public List<FindReviewResponseDto> findAllReviewService() {
+    public List<FindReviewResponseDto> findAllReviewService(Long storeId) {
         // DB에서 가져오기
         List<Review> reviewList = reviewRepository
-            .findAll();
+            .findByStoreId(storeId);
 
         // dtoList로 변환하기 위해 선언
         List<FindReviewResponseDto> findReviewResponseDtoList = new ArrayList<>();

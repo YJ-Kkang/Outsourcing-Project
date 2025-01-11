@@ -40,9 +40,12 @@ public class ReviewController {
 
     // 리뷰 다건 조회(가게 정보 기준, 최신순 정렬)
     // 리뷰 별점 범위에 따라 조회 가능
-    @GetMapping
-    public List<FindReviewResponseDto> findAllReview() {
-    List<FindReviewResponseDto> findAllFindReviewResponseDtoList = reviewServiceImpl.findAllReviewService();
+    @GetMapping("/stores/{storeId}/reviews")
+    public List<FindReviewResponseDto> findAllReview(
+        @PathVariable("storeId") Long storeId
+        // 쿼리파람 값 컨트롤러에서 받아서 서비스에서 그 값 받아서 해결하기.(별점 범위, 최신순 정렬)
+        ) {
+    List<FindReviewResponseDto> findAllFindReviewResponseDtoList = reviewServiceImpl.findAllReviewService(storeId);
     return findAllFindReviewResponseDtoList;
     }
 
