@@ -60,12 +60,12 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public UpdateOrderResponseDto updateOrderStatus(UpdateOrderRequestDto requestDto) {
-        Order foundOrder = orderRepository.findByIdAndOrderStatusNot(
+        Order foundOrder = orderRepository.findByIdAndOrderStateNot(
             requestDto.getId(),
             OrderState.DELIVERED
         ).orElseThrow(OrderNotFoundException::new);
 
-        OrderState nextStatus = OrderState.of(requestDto.getOrderStatus());
+        OrderState nextStatus = OrderState.of(requestDto.getOrderState());
 
         foundOrder.updateOrderStatus(nextStatus);
 
