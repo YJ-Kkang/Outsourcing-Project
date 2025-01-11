@@ -30,7 +30,6 @@ public class JwtFilter implements Filter {
     };
 
 
-
     @Override
     public void doFilter(
         ServletRequest servletRequest,
@@ -53,11 +52,12 @@ public class JwtFilter implements Filter {
          * (1) 회원가입 또는 로그인 URI
          */
         boolean isSignUpOrSignInURI = isSignUpURI(requestURI) || isSignInURI(requestURI);
-        if(isSignUpOrSignInURI) {
+        if (isSignUpOrSignInURI) {
 
             // 토큰이 없음 -> 통과
-            boolean isInvalidAuthorizationHeader = authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
-            if(isInvalidAuthorizationHeader) {
+            boolean isInvalidAuthorizationHeader =
+                authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
+            if (isInvalidAuthorizationHeader) {
                 log.info("JWT 토큰 없음");
                 filterChain.doFilter(servletRequest, servletResponse);
                 return;
@@ -76,8 +76,9 @@ public class JwtFilter implements Filter {
 
         // 토큰이 없는 경우
         log.info("authorizaionHeader : {}", authorizationHeader);
-        boolean isInvalidAuthorizationHeader = authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
-        if(isInvalidAuthorizationHeader) {
+        boolean isInvalidAuthorizationHeader =
+            authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
+        if (isInvalidAuthorizationHeader) {
             log.info("JWT 토큰이 필요합니다.");
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 필요합니다."); //todo
             return;
@@ -89,7 +90,7 @@ public class JwtFilter implements Filter {
 
         // 유효하지 않은 case
         boolean isValidateToken = jwtUtil.validateToken(jwtToken);
-        if(!isValidateToken) {
+        if (!isValidateToken) {
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
             httpResponse.getWriter().write("{\"error\": \"Unauthorized\"}"); // todo
             return;
