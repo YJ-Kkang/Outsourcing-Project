@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
@@ -48,7 +49,6 @@ public class OwnerAuthServiceImpl implements OwnerAuthService {
 
     @Override
     public SignInOwnerResponseDto signIn(SignInOwnerRequestDto requestDto) {
-        // todo 로그인 상태가 아닌 사장만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 사장님들 중에서 이메일 값이 일치하는 사장님 추출
         Owner foundOwner = ownerAuthRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
@@ -75,6 +75,7 @@ public class OwnerAuthServiceImpl implements OwnerAuthService {
         return new SignInOwnerResponseDto(token);
     }
 
+    @AuthCheck("OWNER")
     @Override
     public void deleteOwner(String rawPassword, String token) {
         // jwt 토큰에 저장된 사장님 이메일 추출
@@ -101,6 +102,5 @@ public class OwnerAuthServiceImpl implements OwnerAuthService {
         LocalDateTime currentTime = LocalDateTime.now();
         ownerAuthRepository.updateDeletedAtByEmail(ownerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
     }
 }

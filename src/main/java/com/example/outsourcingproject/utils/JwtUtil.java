@@ -52,7 +52,7 @@ public class JwtUtil {
             Jwts.builder()
                 .setSubject(email) // 사용자 식별자
                 // todo 아이디 저장
-                .claim("auth", authority) // 사용자 역할
+                .claim("authority", authority) // 사용자 역할
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 토큰의 만료시간
                 .setIssuedAt(date) // 토큰 발급 시점
                 .signWith(key, signatureAlgorithm) // 암호화 알고리즘
@@ -78,6 +78,12 @@ public class JwtUtil {
     // 토큰에서 사장님 이메일 추출
     public String extractOwnerEmail(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    // 토큰에서 유저 권한 추출 (손님 or 사장님)
+    public String extractAuthority(String token) {
+        log.info("유저 권한 추출 : {}", extractAllClaims(token).get("authority", String.class));
+        return extractAllClaims(token).get("authority", String.class);
     }
 
     // 토큰 유효성 검사

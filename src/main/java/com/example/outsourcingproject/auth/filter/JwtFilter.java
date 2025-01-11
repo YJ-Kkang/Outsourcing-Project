@@ -66,7 +66,7 @@ public class JwtFilter implements Filter {
             // 토큰이 있음 -> todo exception
             log.info("토큰을 가진 상태에서 회원가입 또는 로그인을 할 수 없음");
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            httpResponse.getWriter().write("{\"error\": \"FORBIDDEN\"}");
+            httpResponse.getWriter().write("{\"error\": \"FORBIDDEN\"}"); //todo
             return;
         }
 
@@ -79,7 +79,7 @@ public class JwtFilter implements Filter {
         boolean isInvalidAuthorizationHeader = authorizationHeader == null || !authorizationHeader.startsWith("Bearer ");
         if(isInvalidAuthorizationHeader) {
             log.info("JWT 토큰이 필요합니다.");
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 필요합니다.");
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰이 필요합니다."); //todo
             return;
         }
 
@@ -91,11 +91,18 @@ public class JwtFilter implements Filter {
         boolean isValidateToken = jwtUtil.validateToken(jwtToken);
         if(!isValidateToken) {
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            httpResponse.getWriter().write("{\"error\": \"Unauthorized\"}");
+            httpResponse.getWriter().write("{\"error\": \"Unauthorized\"}"); // todo
             return;
         }
+
         // 통과
+
+        // 요청을 보낸 유저의 권한 확인하기
+        String authority = jwtUtil.extractAuthority(jwtToken);
+        servletRequest.setAttribute("authority", authority); // OWNER 또는 CUSTOMER
+
         filterChain.doFilter(servletRequest, servletResponse);
+
     }
 
     // requestURI가 회원가입 URI인지 확인

@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
@@ -51,7 +52,6 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
 
     @Override
     public SignInCustomerResponseDto signIn(SignInCustomerRequestDto requestDto) {
-        // todo 로그인 상태가 아닌 손님만 들어올 수 있게 -> 필터
 
         // 탈퇴하지 않은 손님들 중에서 이메일 값이 일치하는 손님 추출
         Customer foundCustomer = customerAuthRepository.findByEmailAndIsDeletedFalse(
@@ -79,6 +79,7 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
         return new SignInCustomerResponseDto(token);
     }
 
+    @AuthCheck("CUSTOMER")
     @Override
     @Transactional
     public void deleteCustomer(String rawPassword, String token) {
@@ -104,8 +105,6 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
         customerAuthRepository.updateIsDeletedByEmail(customerEmail, 1);
         LocalDateTime currentTime = LocalDateTime.now();
         customerAuthRepository.updateDeletedAtByEmail(customerEmail, currentTime);
-
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 엔티티만 isDelete, deletedAt 수정
 
     }
 }
