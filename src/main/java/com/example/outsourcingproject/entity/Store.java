@@ -3,9 +3,12 @@ package com.example.outsourcingproject.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalTime;
 import lombok.Getter;
@@ -18,8 +21,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "stores")
 @Getter
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE stores SET is_deleted = true WHERE id = ?")
 public class Store extends BaseEntity {
 
     @Comment("가게 식별자")
@@ -28,7 +29,6 @@ public class Store extends BaseEntity {
     @Column(columnDefinition = "BIGINT")
     private Long id;
 
-    // todo 연관 관계 설정 필요?
     @Comment("사장님 식별자")
     private Long ownerId;
 
@@ -73,7 +73,23 @@ public class Store extends BaseEntity {
     )
     private LocalTime closesAt;
 
-    @Column(insertable=false, updatable=false)
+    @Comment("첫 번째 메뉴 카테고리 식별자")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "category_one_id"
+    )
+    private Category categoryOne;
+
+    @Comment("두 번째 메뉴 카테고리 식별자")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "category_two_id"
+    )
+    private Category categoryTwo;
+
+    @Column(
+        insertable=false, updatable=false
+    )
     private final boolean is_deleted = Boolean.FALSE;
 
     protected Store() {
@@ -86,7 +102,9 @@ public class Store extends BaseEntity {
         String storeTelephone,
         Integer minimumPurchase,
         LocalTime opensAt,
-        LocalTime closesAt
+        LocalTime closesAt,
+        Category categoryOne,
+        Category categoryTwo
     ) {
         this.ownerId = ownerId;
         this.storeName = storeName;
@@ -95,6 +113,8 @@ public class Store extends BaseEntity {
         this.minimumPurchase = minimumPurchase;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
+        this.categoryOne = categoryOne;
+        this.categoryTwo = categoryTwo;
     }
 
     public void update(
