@@ -30,7 +30,7 @@ public class OrderAspect {
         UpdateOrderRequestDto requestDto = (UpdateOrderRequestDto) args[0];
 
         System.out.println("Order ID: " + requestDto.getId());
-        System.out.println("Updated Order Status: " + responseDto.getUpdatedOrderStatus());
+        System.out.println("Updated Order State: " + responseDto.getUpdatedOrderState());
 
         return result; // todo 주문 요청 시각이랑 가게 id 출력도 같이 해야 함
     }
