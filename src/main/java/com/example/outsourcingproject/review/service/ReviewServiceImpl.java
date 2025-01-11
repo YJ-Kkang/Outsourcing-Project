@@ -9,6 +9,7 @@ import com.example.outsourcingproject.order.OrderStatus;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.review.dto.request.CreateReviewRequestDto;
 import com.example.outsourcingproject.review.dto.response.CreateReviewResponseDto;
+import com.example.outsourcingproject.review.dto.response.FindReviewResponseDto;
 import com.example.outsourcingproject.review.repository.ReviewRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
@@ -90,18 +91,21 @@ public class ReviewServiceImpl{
         );
     }
 
-    public List<CreateReviewResponseDto> findAllReviewService() {
+    public List<FindReviewResponseDto> findAllReviewService() {
         // DB에서 가져오기
-        List<Review> reviewList = new ArrayList<>();
-        reviewList = reviewRepository
+        List<Review> reviewList = reviewRepository
             .findAll();
 
         // dtoList로 변환하기 위해 선언
-        List<CreateReviewResponseDto> createReviewResponseDtoList = new ArrayList<>();
+        List<FindReviewResponseDto> findReviewResponseDtoList = new ArrayList<>();
 
+        // reviewList 모두 돌면서 새로운 findReviewResponseDtoList에 추가
+        // reviewList를 findReviewResponseDtoList로 변환
         for (Review review : reviewList) {
-            CreateReviewResponseDto createReviewResponseDto = new CreateReviewResponseDto(reviewList);
-
+            FindReviewResponseDto findReviewResponseDto = new FindReviewResponseDto(review);
+            findReviewResponseDtoList.add(findReviewResponseDto);
         }
+
+        return findReviewResponseDtoList;
     }
 }

@@ -14,19 +14,8 @@ public class FindReviewResponseDto {
     private final Integer rating;
     private final LocalDateTime createdAt;
 
-    public FindReviewResponseDto(
-        Long customerId,
-        String contents,
-        Integer rating,
-        LocalDateTime createdAt
-    ) {
-        this.id = customerId;
-        this.contents = contents;
-        this.rating = rating;
-        this.createdAt = createdAt;
-    }
-
     public FindReviewResponseDto(Review review) {
+        this.id = review.getId();
         this.contents = review.getContents();
         this.rating = review.getRating();
         this.createdAt = review.getCreatedAt();
