@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.exception;
 
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionException;
 import com.example.outsourcingproject.exception.notfound.NotFoundException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,6 +23,15 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InvalidTransitionException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidTransitionException(
+        InvalidTransitionException ex) {
+        return handleException(
+            ex.getErrorCode().getCode(),
+            ex.getErrorCode().getMessage(),
+            ex.getErrorCode().getStatus()
+        );
+    }
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Map<String, String>> handlerCustomException(CustomException ex) {

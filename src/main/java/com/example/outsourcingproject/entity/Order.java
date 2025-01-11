@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.entity;
 
+import com.example.outsourcingproject.exception.invalidtransition.InvalidPendingTransitionException;
 import com.example.outsourcingproject.order.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -95,12 +96,11 @@ public class Order extends BaseEntity {
 
         // !accepted이면 예외 던지기
 
-        // 끝난다는 걸 명확히 하고자 예외
         switch (this.orderStatus) {
             case PENDING:
                 if (isInvalidPendingTransition) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT);
-                } // todo
+                    throw new InvalidPendingTransitionException();
+                }
                 break;
             case ACCEPTED:
                 if (isInvalidAcceptedTransition) {
