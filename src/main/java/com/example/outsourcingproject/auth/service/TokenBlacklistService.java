@@ -18,7 +18,8 @@ public class TokenBlacklistService {
         String resolvedToken = resolveToken(token);
 
         // Redis에 토큰 저장 (만료 시간은 토큰 자체의 만료 시간과 동일)
-        redisTemplate.opsForValue().set(resolvedToken, "blacklisted", TOKEN_EXPIRATION_TIME, TimeUnit.SECONDS);
+        redisTemplate.opsForValue()
+            .set(resolvedToken, "blacklisted", TOKEN_EXPIRATION_TIME, TimeUnit.SECONDS);
     }
 
     // 토큰이 Blacklist에 있는지 확인
