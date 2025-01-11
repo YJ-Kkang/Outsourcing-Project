@@ -21,6 +21,7 @@ public enum ErrorCode {
     INVALID_ACCEPTED_STATE_TRANSITION(HttpStatus.CONFLICT,"ERR0014", "수락 상태에서 이 작업을 수행할 수 없습니다. 주문은 수락 후 배달 중 상태로만 변경 가능합니다.");
 
 
+
     private final HttpStatus status;
     private final String code;
     private final String message;
