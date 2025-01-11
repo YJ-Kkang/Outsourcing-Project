@@ -28,7 +28,7 @@ public class AuthCheckAspect {
         AuthCheck authCheck = method.getAnnotation(AuthCheck.class);
 
         // 필요한 권한이 아닌 다른 권한으로 접근할 때
-        if(authCheck != null && !authCheck.value().equals(authority)) {
+        if (authCheck != null && !authCheck.value().equals(authority)) {
             log.info("권한 없음 : 필요한 권한은 {}, 가지고 있는 권한 : {}", authCheck.value(), authority);
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
