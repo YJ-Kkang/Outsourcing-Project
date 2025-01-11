@@ -23,7 +23,9 @@ public enum ErrorCode {
         "수락 상태에서 이 작업을 수행할 수 없습니다. 주문은 수락 후 배달 중 상태로만 변경 가능합니다."),
     INVALID_CANCELED_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0015", "취소 처리된 주문은 상태를 변경할 수 없습니다."),
     INVALID_DELIVERING_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0016",
-        "배달 중 상태에서 이 작업을 수행할 수 없습니다. 주문은 배달 완료 상태로만 변경 가능합니다.");
+        "배달 중 상태에서 이 작업을 수행할 수 없습니다. 주문은 배달 완료 상태로만 변경 가능합니다."),
+    BAD_REQUEST_STORE_LIMIT(HttpStatus.BAD_REQUEST, "ERR0017", "한 계정으로 가게는 최대 3개까지만 열 수 있습니다."),
+    BAD_REQUEST_CATEGORY_INVALID_BOUND(HttpStatus.BAD_REQUEST, "ERR0018", "가게 대표 메뉴 카테고리가 2개 입력되지 않았습니다.");
 
 
     private final HttpStatus status;
