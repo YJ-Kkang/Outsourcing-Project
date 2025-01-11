@@ -21,5 +21,5 @@ public interface StoreService {
 
     UpdateStoreResponseDto updateStore(Long id, UpdateStoreRequestDto requestDto);
 
-//    void deleteStore(Long storeId);
+    void deleteStore(Long storeId, String token);
 }

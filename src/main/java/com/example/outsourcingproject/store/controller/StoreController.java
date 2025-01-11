@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.patterns.IToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -79,16 +81,15 @@ public class StoreController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-//    // 가게 폐업
-//    @DeleteMapping
-//    public ResponseEntity<Void> deleteStore(
-//        @PathVariable Long storeId
-//        //todo 폐업시 비밀번호 확인?
-//    ) {
-//        storeService.deleteStore(storeId);
-//
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    // 가게 폐업
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(
+        @PathVariable Long storeId,
+        @RequestHeader("Authorization") String token
+    ) {
+        storeService.deleteStore(storeId, token);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 
 }

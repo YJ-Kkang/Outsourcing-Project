@@ -144,11 +144,26 @@ public class StoreServiceImpl implements StoreService {
         );
     }
 
-//
-//    // 가게 폐업
-//    @Override
-//    public void deleteStore(Long storeId) {
-//
-//    }
+
+    // 가게 폐업
+    @Override
+    @Transactional
+    public void deleteStore(Long storeId, String token) {
+
+        Store store = storeRepository.findById(storeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        /**
+         * 토큰으로 권한 인증을 받은 사장님과 경로를 통해 값을 받아서 그 상점의 사장님과 같은지 검증로직
+         */
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
+        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+
+        if (!(owner.getId().equals(store.getOwnerId()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        storeRepository.delete(store);
+    }
 
 }
