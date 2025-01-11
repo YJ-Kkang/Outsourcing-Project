@@ -17,7 +17,8 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "ERR0010", "존재하지 않는 리뷰입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "ERR0011", "접근 권한이 없습니다."),
     EMAIL_EXIST(HttpStatus.BAD_REQUEST, "ERR0012", "이미 존재하거나 탈퇴한 이메일입니다."),
-    INVALID_PENDING_TRANSITION(HttpStatus.CONFLICT,"ERR0013", "대기 중 상태에서 이 작업을 수행할 수 없습니다. 주문을 먼저 수락해주세요.");
+    INVALID_PENDING_STATE_TRANSITION(HttpStatus.CONFLICT,"ERR0013", "대기 중 상태에서 이 작업을 수행할 수 없습니다. 주문을 먼저 수락해주세요."),
+    INVALID_ACCEPTED_STATE_TRANSITION(HttpStatus.CONFLICT,"ERR0014", "수락 상태에서 이 작업을 수행할 수 없습니다. 주문은 수락 후 배달 중 상태로만 변경 가능합니다.");
 
 
     private final HttpStatus status;
