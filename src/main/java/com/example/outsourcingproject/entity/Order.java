@@ -1,6 +1,7 @@
 package com.example.outsourcingproject.entity;
 
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromAcceptedException;
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromCanceledException;
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromPendingException;
 import com.example.outsourcingproject.order.OrderState;
 import jakarta.persistence.Column;
@@ -91,12 +92,9 @@ public class Order extends BaseEntity {
         boolean isNotAcceptedOrCanceled = !(orderState.equals(OrderState.ACCEPTED)
             || orderState.equals(OrderState.CANCELED));
 
-        boolean isNotAccepted  = !(orderState.equals(OrderState.ACCEPTED));
-
         boolean isNotDeliveringFromAccepted = !orderState.equals(OrderState.DELIVERING);
 
         boolean isNotDeliveredFromDelivering = !orderState.equals(OrderState.DELIVERED);
-
 
         switch (this.orderState) {
             case PENDING:
@@ -109,6 +107,8 @@ public class Order extends BaseEntity {
                     throw new InvalidTransitionFromAcceptedException();
                 }
                 break;
+            case CANCELED:
+                throw new InvalidTransitionFromCanceledException();
             case DELIVERING:
                 if (isNotDeliveredFromDelivering) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT);
