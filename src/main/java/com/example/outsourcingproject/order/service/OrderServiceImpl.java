@@ -69,6 +69,6 @@ public class OrderServiceImpl implements OrderService {
 
         foundOrder.updateOrderStatus(nextStatus);
 
-        return new UpdateOrderResponseDto(foundOrder.getOrderState());
+        return new UpdateOrderResponseDto(foundOrder);
     }
 }

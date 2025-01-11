@@ -12,6 +12,7 @@ public class CreateOrderItemWrapper {
     private final List<CreateOrderItemResponseDto> orderDetails;
     private final Integer totalAmountSum;
     private final Integer totalPriceSum;
+    private final Long storeId;
     private final Long orderId;
     private final OrderState orderState;
 
@@ -24,6 +25,7 @@ public class CreateOrderItemWrapper {
         this.orderDetails = orderDetails;
         this.totalAmountSum = totalAmountSum;
         this.totalPriceSum = totalPriceSum;
+        this.storeId = order.getStore().getId();
         this.orderId = order.getId();
         this.orderState = order.getOrderState();
     }

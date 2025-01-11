@@ -6,6 +6,9 @@ import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.OrderItem;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
+import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.repository.OrderRepository;
@@ -40,11 +43,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     ) {
 
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND
-                )
-            ); // todo 가게 없을 시 예외 처리 -> '가게가 폐업 상태일 때 예외 처리 필요'
+            .orElseThrow(StoreNotFoundException::new);
 
         LocalTime timeToOrder = LocalTime.now();
         boolean isBeforeOpensAt = timeToOrder.isBefore(foundStore.getOpensAt());
@@ -68,11 +67,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         responseDtoList = requestDtoList.stream()
             .map(requestDto -> {
                 Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
-                    .orElseThrow(
-                        () -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND
-                        )
-                    ); // todo 메뉴가 없을 시 예외 처리
+                    .orElseThrow(MenuNotFoundException::new);
 
                 OrderItem orderItemToSave = new OrderItem(
                     savedOrder,
@@ -116,9 +111,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     public ReadOrderItemWrapper readAllOrderItemsByOrderId(Long orderId) {
 
         Order foundOrder = orderRepository.findById(orderId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 주문 식별자로 조회
+            .orElseThrow(OrderNotFoundException::new);
 
         List<OrderItem> orderItemList = new ArrayList<>();
 

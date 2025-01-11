@@ -21,7 +21,9 @@ public enum ErrorCode {
         "대기 중 상태에서 이 작업을 수행할 수 없습니다. 주문을 먼저 수락해주세요."),
     INVALID_ACCEPTED_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0014",
         "수락 상태에서 이 작업을 수행할 수 없습니다. 주문은 수락 후 배달 중 상태로만 변경 가능합니다."),
-    INVALID_CANCELED_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0015", "취소 처리된 주문은 상태를 변경할 수 없습니다.");
+    INVALID_CANCELED_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0015", "취소 처리된 주문은 상태를 변경할 수 없습니다."),
+    INVALID_DELIVERING_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0016",
+        "배달 중 상태에서 이 작업을 수행할 수 없습니다. 주문은 배달 완료 상태로만 변경 가능합니다.");
 
 
     private final HttpStatus status;

@@ -2,6 +2,7 @@ package com.example.outsourcingproject.entity;
 
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromAcceptedException;
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromCanceledException;
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromDeliveringException;
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionFromPendingException;
 import com.example.outsourcingproject.order.OrderState;
 import jakarta.persistence.Column;
@@ -111,7 +112,7 @@ public class Order extends BaseEntity {
                 throw new InvalidTransitionFromCanceledException();
             case DELIVERING:
                 if (isNotDeliveredFromDelivering) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT);
+                    throw new InvalidTransitionFromDeliveringException();
                 }
                 break;
         }
