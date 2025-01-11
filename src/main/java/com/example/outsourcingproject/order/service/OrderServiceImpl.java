@@ -4,7 +4,7 @@ import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.dto.request.UpdateOrderRequestDto;
 import com.example.outsourcingproject.order.dto.response.OrderResponseDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
@@ -62,13 +62,13 @@ public class OrderServiceImpl implements OrderService {
     public UpdateOrderResponseDto updateOrderStatus(UpdateOrderRequestDto requestDto) {
         Order foundOrder = orderRepository.findByIdAndOrderStatusNot(
             requestDto.getId(),
-            OrderStatus.DELIVERED
+            OrderState.DELIVERED
         ).orElseThrow(OrderNotFoundException::new);
 
-        OrderStatus nextStatus = OrderStatus.of(requestDto.getOrderStatus());
+        OrderState nextStatus = OrderState.of(requestDto.getOrderStatus());
 
         foundOrder.updateOrderStatus(nextStatus);
 
-        return new UpdateOrderResponseDto(foundOrder.getOrderStatus());
+        return new UpdateOrderResponseDto(foundOrder.getOrderState());
     }
 }
