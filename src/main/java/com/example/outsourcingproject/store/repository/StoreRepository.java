@@ -10,5 +10,5 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Long countByOwnerId(Long ownerId);
 
     // 가게 이름으로 가게를 조회할 때 폐업하지 않은 가게만 조회하는 기능
-    List<Store> findByStoreNameContainingAndIsDeletedFalse(String storeName);
+    List<Store> findByStoreNameContainingAndIsDeleted(String storeName, Integer isDeleted);
 }

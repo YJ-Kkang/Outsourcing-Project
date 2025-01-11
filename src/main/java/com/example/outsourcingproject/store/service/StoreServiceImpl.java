@@ -4,8 +4,8 @@ import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
-import com.example.outsourcingproject.exception.CustomException;
-import com.example.outsourcingproject.exception.ErrorCode;
+import com.example.outsourcingproject.exception.notfound.OwnerNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
@@ -41,7 +41,7 @@ public class StoreServiceImpl implements StoreService {
         String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
         Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED)); // todo
+            .orElseThrow(OwnerNotFoundException::new);
 
         Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
 
@@ -70,7 +70,7 @@ public class StoreServiceImpl implements StoreService {
 
         List<Store> storeList = new ArrayList<>();
 
-        storeList = storeRepository.findByStoreNameContainingAndIsDeletedFalse(storeName);
+        storeList = storeRepository.findByStoreNameContainingAndIsDeleted(storeName, 0);
 
         List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
 
@@ -88,14 +88,11 @@ public class StoreServiceImpl implements StoreService {
     public StoreResponseDto findStoreByStoreId(Long storeId) {
 
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            );
-        // todo 가게 id로 가게를 찾을 수 없을 시 예외 처리
+            .orElseThrow(StoreNotFoundException::new);
 
         List<Menu> menuList = new ArrayList<>();
 
-        menuList = menuRepository.findAllByStoreIdAndIsDeletedFalse(foundStore.getId());
+        menuList = menuRepository.findAllByStoreIdAndIsDeleted(foundStore.getId(), 0);
 
         List<MenuDto> menuDtoList = new ArrayList<>();
 

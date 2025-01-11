@@ -10,6 +10,6 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     List<Menu> findAllByStoreId(Long storeId);
 
-    List<Menu> findAllByStoreIdAndIsDeletedFalse(Long storeId);
+    List<Menu> findAllByStoreIdAndIsDeleted(Long storeId, Integer isDeleted);
 
 }
