@@ -6,13 +6,13 @@ import lombok.Getter;
 public class UpdateOrderRequestDto {
 
     private final Long id;
-    private final String orderStatus;
+    private final String orderState;
 
     public UpdateOrderRequestDto(
         Long id,
-        String orderStatus
+        String orderState
     ) {
         this.id = id;
-        this.orderStatus = orderStatus;
+        this.orderState = orderState;
     }
 }

@@ -1,13 +1,18 @@
 package com.example.outsourcingproject.aspect;
 
+import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionException;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.dto.request.UpdateOrderRequestDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
+import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Aspect
 @Component
 public class OrderAspect {
@@ -22,16 +27,35 @@ public class OrderAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
-        System.out.println(methodName + " method starts");
+        log.info("{} method starts", methodName);
 
-        Object result = joinPoint.proceed();
-
-        UpdateOrderResponseDto responseDto = (UpdateOrderResponseDto) result;
         UpdateOrderRequestDto requestDto = (UpdateOrderRequestDto) args[0];
+        Long orderId = requestDto.getId();
 
-        System.out.println("Order ID: " + requestDto.getId());
-        System.out.println("Updated Order Status: " + responseDto.getUpdatedOrderStatus());
+        Object result = null;
 
-        return result; // todo 주문 요청 시각이랑 가게 id 출력도 같이 해야 함
+        try {
+            result = joinPoint.proceed();
+        } catch (InvalidTransitionException ex) {
+            log.error(
+                "Invalid Transition Exception occurred while executing method {} with Order ID: {}",
+                methodName,
+                orderId,
+                ex
+            );
+            throw ex;
+        }
+        UpdateOrderResponseDto responseDto = (UpdateOrderResponseDto) result;
+
+        Long storeId = responseDto.getStoreId();
+        OrderState updatedOrderState = responseDto.getUpdatedOrderState();
+        LocalDateTime now = LocalDateTime.now();
+
+        log.info("Order ID: {}", orderId);
+        log.info("Store ID: {}", storeId);
+        log.info("Updated Order State: {}", updatedOrderState);
+        log.info("Updated Date and Time: {}", now);
+
+        return result;
     }
 }

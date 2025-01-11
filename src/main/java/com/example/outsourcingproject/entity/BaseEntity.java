@@ -39,9 +39,9 @@ public abstract class BaseEntity {
     @Comment("삭제 여부")
     @Column(
         name = "is_deleted",
-        columnDefinition = "TINYINT(0)"
+        columnDefinition = "TINYINT(1) DEFAULT 0"
     )
-    private Boolean isDeleted = false;
+    private Integer isDeleted = 0;
 
     @Comment("삭제일")
     @Column(
@@ -54,7 +54,7 @@ public abstract class BaseEntity {
     }
 
     public void markAsDeleted() {
-        this.isDeleted = true;
+        this.isDeleted = 1;
         this.deletedAt = LocalDateTime.now();
     }
 }

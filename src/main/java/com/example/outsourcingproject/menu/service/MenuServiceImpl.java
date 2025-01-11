@@ -2,6 +2,8 @@ package com.example.outsourcingproject.menu.service;
 
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.dto.request.CreateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.request.UpdateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.response.CreateMenuResponseDto;
@@ -28,9 +30,7 @@ public class MenuServiceImpl implements MenuService {
         CreateMenuRequestDto requestDto
     ) {
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 가게 식별자로 가게를 조회했을 때 가게가 없으면 예외 처리
+            .orElseThrow(StoreNotFoundException::new);
 
         Menu menuToSave = new Menu(
             requestDto.getMenuName(),
@@ -57,14 +57,10 @@ public class MenuServiceImpl implements MenuService {
         UpdateMenuRequestDto requestDto
     ) {
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 가게 식별자로 가게를 조회했을 때 가게가 없으면 예외 처리
+            .orElseThrow(StoreNotFoundException::new);
 
         Menu foundMenu = menuRepository.findById(menuId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 메뉴 식별자로 메뉴를 조회했을 때 메뉴가 없으면 예외 처리
+            .orElseThrow(MenuNotFoundException::new);
 
         boolean isMenuFromDifferentStore = !foundMenu.getStore().getId().equals(foundStore.getId());
 
@@ -89,9 +85,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public void deleteMenu(Long menuId) {
         Menu foundMenu = menuRepository.findById(menuId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            );
+            .orElseThrow(MenuNotFoundException::new);
 
         foundMenu.markAsDeleted();
     }
