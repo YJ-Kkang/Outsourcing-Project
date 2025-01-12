@@ -39,7 +39,6 @@ public class ReviewServiceImpl {
         CreateReviewRequestDto requestDto,
         String token
     ) {
-        // 리뷰 데이터를 저장하기 위한 사전 작업
         // 주문 조회
         Order findorder = orderRepository
             .findById(orderId)
@@ -69,6 +68,15 @@ public class ReviewServiceImpl {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)
                 // todo 손님 이메일로 찾을 수 있는 아이디 없으면 예외 처리
             );
+
+        // 주문 ID와 손님 ID로 리뷰가 이미 존재하는지 확인
+        reviewRepository
+            .findByOrderIdAndCustomerId(orderId, findCustomer.getId())
+            .ifPresent
+                (review -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT); // todo 리뷰가 이미 존재하는 경우 예외 처리
+                });
+
 
         // Dto 에서 리뷰 내용 가져오고, 리뷰 엔티티 만들어주기(엔티티 == 테이블)
         Review reviewToSave = new Review(
@@ -123,7 +131,7 @@ public class ReviewServiceImpl {
         }
 
         if (startRating == null && endRating != null) {
-            // endRating만 지정된 경우
+            // endRating 만 지정된 경우
             reviewList = reviewRepository
                 .findByStoreIdAndRatingLessThanEqual(
                     storeId,

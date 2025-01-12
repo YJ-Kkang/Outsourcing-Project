@@ -2,6 +2,7 @@ package com.example.outsourcingproject.review.repository;
 
 import com.example.outsourcingproject.entity.Review;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -27,4 +28,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         Integer startRating,
         Integer endRating
     );
+
+    // 주문 ID와 손님 ID로 리뷰 조회
+    Optional<Review> findByOrderIdAndCustomerId(Long orderId, Long customerId);
 }
