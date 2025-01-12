@@ -5,6 +5,7 @@ import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,8 +48,9 @@ public class CustomerAuthController {
     @DeleteMapping("/customers")
     public ResponseEntity<Void> deleteCustomer(
         @RequestBody String password,
-        @RequestHeader("Authorization") String token
+        HttpServletRequest request
     ) {
+        String token = request.getHeader("Authorization");
         customerAuthService.deleteCustomer(password, token);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
