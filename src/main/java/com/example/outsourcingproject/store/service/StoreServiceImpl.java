@@ -116,14 +116,17 @@ public class StoreServiceImpl implements StoreService {
         return responseDtoList;
     }
 
+    @Transactional
+    @Override
     public List<StoreCategorySearchResponseDto> readAllStoresByStoreCategory(
         String storeCategoryName) {
 
         List<Store> storeList = new ArrayList<>();
 
-        storeList = storeRepository.findByStoreCategoryOne_NameOrStoreCategoryTwo_Name(
+        storeList = storeRepository.findByStoreCategoryOne_NameOrStoreCategoryTwo_NameAndIsDeleted(
             storeCategoryName,
-            storeCategoryName
+            storeCategoryName,
+            0
         );
 
         List<StoreCategorySearchResponseDto> responseDtoList = new ArrayList<>();
