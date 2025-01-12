@@ -24,7 +24,9 @@ import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -129,9 +131,32 @@ public class StoreServiceImpl implements StoreService {
             0
         );
 
+        List<Menu> menuList = new ArrayList<>();
+
+        menuList = menuRepository.findByMenuCategoryOne_NameOrMenuCategoryTwo_NameOrMenuCategoryThree_NameAndIsDeleted(
+            storeCategoryName,
+            storeCategoryName,
+            storeCategoryName,
+            0
+        );
+
+        Set<Long> storeIdSet = new HashSet<>();
+
+        menuList.stream()
+            .map(menu -> menu.getStore().getId())
+            .forEach(storeIdSet::add);
+
+        storeList.stream()
+            .map(Store::getId)
+            .forEach(storeIdSet::add);
+
+        List<Store> searchedStoreList = new ArrayList<>();
+
+        searchedStoreList = storeRepository.findAllById(storeIdSet);
+
         List<StoreCategorySearchResponseDto> responseDtoList = new ArrayList<>();
 
-        responseDtoList = storeList.stream()
+        responseDtoList = searchedStoreList.stream()
             .map(StoreCategorySearchResponseDto::new)
             .toList();
 
