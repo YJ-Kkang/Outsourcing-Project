@@ -7,6 +7,7 @@ import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponse
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.service.StoreService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -84,9 +85,11 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(
         @PathVariable Long storeId,
-        @RequestHeader("Authorization") String token
+        HttpServletRequest request
     ) {
+        String token = request.getHeader("Authorization");
         storeService.deleteStore(storeId, token);
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

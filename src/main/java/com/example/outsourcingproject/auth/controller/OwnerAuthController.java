@@ -5,13 +5,13 @@ import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.service.OwnerAuthServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,8 +46,9 @@ public class OwnerAuthController {
     @DeleteMapping("/owners")
     public ResponseEntity<Void> deleteOwner(
         @RequestBody String password,
-        @RequestHeader("Authorization") String token
+        HttpServletRequest request
     ) {
+        String token = request.getHeader("Authorization");
         ownerAuthService.deleteOwner(password, token);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
