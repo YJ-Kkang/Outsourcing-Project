@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class MenuCategory {
+
     @Comment("메뉴용 카테고리 식별자")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
