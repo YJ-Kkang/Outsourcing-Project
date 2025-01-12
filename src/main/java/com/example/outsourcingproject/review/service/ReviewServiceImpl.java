@@ -144,7 +144,7 @@ public class ReviewServiceImpl {
             reviewList = reviewRepository.findByStoreId(storeId);
         }
 
-        // 정렬 조건 적용  todo 쿼리 레벨에서 정렬할 수 있도록 JPA 쿼리 메서드 쓰기
+        // 정렬 조건 적용
         if ("latest".equals(sort)) {
             // 최신순 정렬
             reviewList.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
