@@ -71,19 +71,19 @@ public class Store extends BaseEntity {
     )
     private LocalTime closesAt;
 
-    @Comment("첫 번째 메뉴 카테고리 식별자")
+    @Comment("첫 번째 가게 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "category_one_id"
+        name = "store_category_one_id"
     )
-    private Category categoryOne;
+    private StoreCategory storeCategoryOne;
 
-    @Comment("두 번째 메뉴 카테고리 식별자")
+    @Comment("두 번째 가게 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "category_two_id"
+        name = "stor_category_two_id"
     )
-    private Category categoryTwo;
+    private StoreCategory storeCategoryTwo;
 
     @Column(
         insertable = false, updatable = false
@@ -101,8 +101,8 @@ public class Store extends BaseEntity {
         Integer minimumPurchase,
         LocalTime opensAt,
         LocalTime closesAt,
-        Category categoryOne,
-        Category categoryTwo
+        StoreCategory storeCategoryOne,
+        StoreCategory storeCategoryTwo
     ) {
         this.ownerId = ownerId;
         this.storeName = storeName;
@@ -111,8 +111,8 @@ public class Store extends BaseEntity {
         this.minimumPurchase = minimumPurchase;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
-        this.categoryOne = categoryOne;
-        this.categoryTwo = categoryTwo;
+        this.storeCategoryOne = storeCategoryOne;
+        this.storeCategoryTwo = storeCategoryTwo;
     }
 
     public void update(

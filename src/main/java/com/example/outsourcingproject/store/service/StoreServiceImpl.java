@@ -1,11 +1,11 @@
 package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
-import com.example.outsourcingproject.category.repository.CategoryRepository;
-import com.example.outsourcingproject.entity.Category;
+import com.example.outsourcingproject.category.repository.StoreCategoryRepository;
 import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.entity.StoreCategory;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.exception.badrequest.CategoryInvalidCountException;
@@ -39,7 +39,7 @@ public class StoreServiceImpl implements StoreService {
     private final OwnerAuthRepository ownerAuthRepository;
     private final JwtUtil jwtUtil;
     private final MenuRepository menuRepository;
-    private final CategoryRepository categoryRepository;
+    private final StoreCategoryRepository storeCategoryRepository;
 
     @Transactional
     @Override
@@ -52,24 +52,27 @@ public class StoreServiceImpl implements StoreService {
         Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(OwnerNotFoundException::new);
 
-        Long storeCount = storeRepository.countByOwnerIdAndIsDeleted(foundOwner.getId(), 0);
+        Long storeCount = storeRepository.countByOwnerIdAndIsDeleted(
+            foundOwner.getId(),
+            0
+        );
 
         if (storeCount >= 3) {
             throw new StoreInvalidCountExcessException();
         }
 
-        List<String> categoryNameList = new ArrayList<>();
+        List<String> storeCategoryNameList = new ArrayList<>();
 
-        categoryNameList = requestDto.getCategoryNameList();
+        storeCategoryNameList = requestDto.getStoreCategoryNameList();
 
-        if (categoryNameList.size() != 2) {
+        if (storeCategoryNameList.size() != 2) {
             throw new CategoryInvalidCountException();
         }
 
-        List<Category> categoryList = new ArrayList<>();
+        List<StoreCategory> storeCategoryList = new ArrayList<>();
 
-        categoryList = categoryRepository.findAllByNameIn(
-            categoryNameList,
+        storeCategoryList = storeCategoryRepository.findAllByNameIn(
+            storeCategoryNameList,
             Sort.unsorted()
         );
 
@@ -81,8 +84,8 @@ public class StoreServiceImpl implements StoreService {
             requestDto.getMinimumPurchase(),
             requestDto.getOpensAt(),
             requestDto.getClosesAt(),
-            categoryList.get(0),
-            categoryList.get(1)
+            storeCategoryList.get(0),
+            storeCategoryList.get(1)
         );
 
         Store savedStore = storeRepository.save(storeToSave);
