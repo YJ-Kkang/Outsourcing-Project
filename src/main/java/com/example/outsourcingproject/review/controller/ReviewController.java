@@ -52,9 +52,9 @@ public class ReviewController {
                 storeId,
                 sort,
                 startRating,
-                endRating);
+                endRating
+            );
 
         return new ResponseEntity<>(findReviewResponseDtoList, HttpStatus.OK);
     }
-
 }

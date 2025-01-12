@@ -18,7 +18,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Table(name = "REVIEWS")
 @Getter
-public class Review extends BaseEntity{
+public class Review extends BaseEntity {
 
     @Comment("리뷰 식별자")
     @Id
@@ -67,7 +67,8 @@ public class Review extends BaseEntity{
     )
     private Store store;
 
-    protected Review() {}
+    protected Review() {
+    }
 
     public Review(Customer customer, Store store, Order order, String contents, Integer rating) {
         this.customer = customer;
@@ -76,7 +77,4 @@ public class Review extends BaseEntity{
         this.contents = contents;
         this.rating = rating;
     }
-
-
-
 }
