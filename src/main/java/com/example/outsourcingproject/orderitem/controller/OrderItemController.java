@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/stores/{storeId}/orders")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderItemController {
 
     private final OrderItemServiceImpl orderItemService;
 
-    @PostMapping()
+    @PostMapping("/{storeId}")
     public ResponseEntity<CreateOrderItemWrapper> createOrderItem(
         @PathVariable("storeId") Long storeId,
         @RequestBody List<CreateOrderItemRequestDto> requestDtoList
@@ -35,11 +35,12 @@ public class OrderItemController {
         return new ResponseEntity<>(responseDtoWrapper, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/each/{orderId}")
     public ResponseEntity<ReadOrderItemWrapper> readAllOrderItems(
         @PathVariable("orderId") Long orderId
     ) {
-        ReadOrderItemWrapper responseDtoWrapper = orderItemService.readAllOrderItemsByOrderId(orderId);
+        ReadOrderItemWrapper responseDtoWrapper = orderItemService.readAllOrderItemsByOrderId(
+            orderId);
 
         return new ResponseEntity<>(responseDtoWrapper, HttpStatus.OK);
     }

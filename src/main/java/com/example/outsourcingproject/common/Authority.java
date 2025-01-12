@@ -6,5 +6,7 @@ public enum Authority {
 
     private final String value;
 
-    Authority(String value) {this.value = value;}
+    Authority(String value) {
+        this.value = value;
+    }
 }

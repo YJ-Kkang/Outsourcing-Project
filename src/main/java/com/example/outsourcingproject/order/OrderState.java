@@ -4,7 +4,7 @@ import java.util.Arrays;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-public enum OrderStatus {
+public enum OrderState {
     PENDING, // 주문 생성 시, 즉 수락 대기 상태
     ACCEPTED, // 주문 수락
     CANCELED, // 주문 취소
@@ -12,12 +12,12 @@ public enum OrderStatus {
     DELIVERED; // DELIVERING 이후 배달 완료
 
     // 기능: 입력된 문자열을 바탕으로 OrderStatus 값을 찾는 메서드
-    public static OrderStatus of(String orderStatus) {
-        return Arrays.stream(OrderStatus.values())
+    public static OrderState of(String orderState) {
+        return Arrays.stream(OrderState.values())
             .filter(
                 status -> status
                     .name()
-                    .equalsIgnoreCase(orderStatus))
+                    .equalsIgnoreCase(orderState))
             .findFirst()
             .orElseThrow(
                 () -> new ResponseStatusException(

@@ -1,5 +1,8 @@
 package com.example.outsourcingproject.auth.service;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
+import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
+import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
@@ -9,75 +12,89 @@ import com.example.outsourcingproject.exception.ErrorCode;
 import com.example.outsourcingproject.utils.JwtUtil;
 import com.example.outsourcingproject.utils.PasswordEncoder;
 import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class OwnerAuthServiceImpl implements OwnerAuthService{
+@RequiredArgsConstructor
+public class OwnerAuthServiceImpl implements OwnerAuthService {
 
     private final OwnerAuthRepository ownerAuthRepository;
     private final JwtUtil jwtUtil;
     PasswordEncoder bcrypt = new PasswordEncoder();
 
-    public OwnerAuthServiceImpl(OwnerAuthRepository ownerAuthRepository, JwtUtil jwtUtil) {
-        this.ownerAuthRepository = ownerAuthRepository;
-        this.jwtUtil = jwtUtil;
-    }
-
     @Override
-    public SignUpOwnerResponseDto signUp(String email, String password) {
+    public SignUpOwnerResponseDto signUp(SignUpOwnerRequestDto requestDto) {
 
         // 등록된 아이디(이메일) 여부 확인
-        boolean isExistEmail = ownerAuthRepository.findByEmail(email).isPresent();
+        boolean isExistEmail = ownerAuthRepository.findByEmail(requestDto.getEmail())
+            .isPresent();
 
-        if(isExistEmail) {
-            log.info("이미 존재하는 이메일입니다. >> {}", email);
+        if (isExistEmail) {
+            log.info("이미 존재하는 이메일입니다. >> {}", requestDto.getEmail());
             throw new CustomException(ErrorCode.EMAIL_EXIST);
         }
-        Owner owner = new Owner(email, bcrypt.encode(password));
-        Owner savedOwner = ownerAuthRepository.save(owner);
+        Owner ownerToSave = new Owner(
+            requestDto.getEmail(),
+            bcrypt.encode(requestDto.getPassword())
+        );
 
-        log.info("사장님 {} 회원가입 완료", email);
+        Owner savedOwner = ownerAuthRepository.save(ownerToSave);
+
+        log.info("사장님 {} 회원가입 완료", requestDto.getEmail());
         return new SignUpOwnerResponseDto(savedOwner);
     }
 
     @Override
-    public SignInOwnerResponseDto signIn(String email, String rawPassword) {
-        // todo 로그인 상태가 아닌 사장만 들어올 수 있게
-        // todo 탈퇴 유저는 로그인 x
-        Owner owner = ownerAuthRepository.findByEmail(email)
+    public SignInOwnerResponseDto signIn(SignInOwnerRequestDto requestDto) {
+
+        // 탈퇴하지 않은 사장님들 중에서 이메일 값이 일치하는 사장님 추출
+        Owner foundOwner = ownerAuthRepository.findByEmailAndIsDeletedFalse(requestDto.getEmail())
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
 
-        String encodedPassword = owner.getPassword();
+        String encodedPassword = foundOwner.getPassword();
 
-        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
+        boolean isPasswordMismatching = !bcrypt.matches(
+            requestDto.getPassword(),
+            encodedPassword
+        );
 
-        if(isPasswordMisMatching){
+        if (isPasswordMismatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-        log.info("사장님 {} 로그인 완료", email);
+        log.info("사장님 {} 로그인 완료", requestDto.getEmail());
 
-        String token = jwtUtil.createToken(email, owner.getAuthority());
+        String token = jwtUtil.createToken(
+            requestDto.getEmail(),
+            foundOwner.getAuthority()
+        );
 
-        return new SignInOwnerResponseDto(token);
+        // 앞의 7글자 ('Bearer ')를 제외한 실제 토큰 부분만 추출
+        String actualToken = token.substring(7);
+
+        return new SignInOwnerResponseDto(actualToken);
     }
 
+    @AuthCheck("OWNER")
     @Override
     public void deleteOwner(String rawPassword, String token) {
-        // jwt 토큰에 저장된 손님 이메일 추출
-        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+        // jwt 토큰에 저장된 사장님 이메일 추출
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // 추출한 이메일로 손님 조회
+        // 추출한 이메일로 사장님 조회
         Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CUSTOMER));
 
         // 비밀번호 일치 여부 확인
-        String encodedPassword = owner.getPassword();
-        boolean isPasswordMisMatching = !bcrypt.matches(rawPassword, encodedPassword);
+        boolean isPasswordMismatching = !bcrypt.matches(
+            rawPassword,
+            owner.getPassword()
+        );
 
-        if(isPasswordMisMatching){
+        if (isPasswordMismatching) {
             log.info("아이디 또는 비밀번호가 잘못되었습니다.");
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
@@ -88,8 +105,5 @@ public class OwnerAuthServiceImpl implements OwnerAuthService{
         LocalDateTime currentTime = LocalDateTime.now();
         ownerAuthRepository.updateDeletedAtByEmail(ownerEmail, currentTime);
 
-        // todo 토큰 삭제 (무효화) 해야함.. 지금은 탈퇴시 데이터만 지우는 걸로
     }
-
-
 }

@@ -6,8 +6,11 @@ import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.OrderItem;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
+import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.orderitem.dto.request.CreateOrderItemRequestDto;
 import com.example.outsourcingproject.orderitem.dto.response.CreateOrderItemResponseDto;
@@ -40,11 +43,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     ) {
 
         Store foundStore = storeRepository.findById(storeId)
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND
-                )
-            ); // todo 가게 없을 시 예외 처리 -> '가게가 폐업 상태일 때 예외 처리 필요'
+            .orElseThrow(StoreNotFoundException::new);
 
         LocalTime timeToOrder = LocalTime.now();
         boolean isBeforeOpensAt = timeToOrder.isBefore(foundStore.getOpensAt());
@@ -57,7 +56,7 @@ public class OrderItemServiceImpl implements OrderItemService {
         } // todo 가게 오픈 시간 전이나 종료 시간 후 주문 시 예외 처리
 
         Order orderToSave = new Order(
-            OrderStatus.PENDING,
+            OrderState.PENDING,
             foundStore
         );
 
@@ -67,31 +66,19 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         responseDtoList = requestDtoList.stream()
             .map(requestDto -> {
+                Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
+                    .orElseThrow(MenuNotFoundException::new);
 
-                    Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
-                        .orElseThrow(
-                            () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND
-                            )
-                        ); // todo 메뉴가 없을 시 예외 처리
+                OrderItem orderItemToSave = new OrderItem(
+                    savedOrder,
+                    foundMenu,
+                    requestDto.getEachAmount()
+                );
 
-                    OrderItem orderItemToSave = new OrderItem(
-                        savedOrder,
-                        foundMenu,
-                        requestDto.getEachAmount()
-                    );
+                OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
 
-                    OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
-
-                    return new CreateOrderItemResponseDto(
-                        savedOrderItem.getId(),
-                        foundMenu.getId(),
-                        savedOrderItem.getEachAmount(),
-                        foundMenu.getMenuPrice(),
-                        savedOrderItem.getTotalPrice()
-                    );
-                }
-            ).toList();
+                return new CreateOrderItemResponseDto(savedOrderItem);
+            }).toList();
 
         Integer totalPriceSum = responseDtoList.stream()
             .mapToInt(CreateOrderItemResponseDto::getTotalPrice)
@@ -108,14 +95,14 @@ public class OrderItemServiceImpl implements OrderItemService {
             .sum();
 
         savedOrder.updateTotals(totalAmountSum, totalPriceSum);
+
         orderRepository.save(savedOrder);
 
         return new CreateOrderItemWrapper(
             responseDtoList,
             totalAmountSum,
             totalPriceSum,
-            savedOrder.getId(),
-            savedOrder.getOrderStatus()
+            savedOrder
         );
     }
 
@@ -124,9 +111,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     public ReadOrderItemWrapper readAllOrderItemsByOrderId(Long orderId) {
 
         Order foundOrder = orderRepository.findById(orderId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-            ); // todo 주문 식별자로 조회
+            .orElseThrow(OrderNotFoundException::new);
 
         List<OrderItem> orderItemList = new ArrayList<>();
 
@@ -147,7 +132,7 @@ public class OrderItemServiceImpl implements OrderItemService {
             foundOrder.getTotalAmountSum(),
             foundOrder.getTotalPriceSum(),
             foundOrder.getId(),
-            foundOrder.getOrderStatus()
+            foundOrder.getOrderState()
         );
     }
 }

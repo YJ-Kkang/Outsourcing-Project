@@ -1,19 +1,35 @@
 package com.example.outsourcingproject.store.service;
 
 import com.example.outsourcingproject.auth.repository.OwnerAuthRepository;
+import com.example.outsourcingproject.category.repository.CategoryRepository;
+import com.example.outsourcingproject.entity.Category;
+import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Owner;
 import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.exception.CustomException;
 import com.example.outsourcingproject.exception.ErrorCode;
+import com.example.outsourcingproject.exception.badrequest.CategoryInvalidCountException;
+import com.example.outsourcingproject.exception.badrequest.StoreInvalidCountExcessException;
+import com.example.outsourcingproject.exception.notfound.OwnerNotFoundException;
+import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
+import com.example.outsourcingproject.menu.repository.MenuRepository;
+import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
+import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.utils.JwtUtil;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,75 +38,149 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final OwnerAuthRepository ownerAuthRepository;
     private final JwtUtil jwtUtil;
+    private final MenuRepository menuRepository;
+    private final CategoryRepository categoryRepository;
 
+    @Transactional
     @Override
     public CreateStoreResponseDto createStore(
         CreateStoreRequestDto requestDto,
         String token
     ) {
-        String storeName = requestDto.getStoreName();
-        String storeAddress = requestDto.getStoreAddress();
-        String storeTelephone = requestDto.getStoreTelephone();
-        Integer minimumPurchase = requestDto.getMinimumPurchase();
-        LocalTime opensAt = requestDto.getOpensAt();
-        LocalTime closesAt = requestDto.getClosesAt();
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
 
-        // jwt 토큰에 저장된 사장님 이메일 추출
-        String ownerEmail = jwtUtil.extractCustomerEmail(token);
+        Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(OwnerNotFoundException::new);
 
-        // 사장님 이메일로 사장님 아이디 추출
-        Owner owner = ownerAuthRepository.findByEmail(ownerEmail)
-            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
-        Long ownerId = owner.getId();
+        Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
 
-        // StoreEntity 생성 (가게 정보를 엔티티로 변환)
-        Store store = new Store(
-            ownerId, storeName, storeAddress, storeTelephone,
-            minimumPurchase,opensAt, closesAt
+        if (storeCount >= 3) {
+            throw new StoreInvalidCountExcessException();
+        }
+
+        List<String> categoryNameList = new ArrayList<>();
+
+        categoryNameList = requestDto.getCategoryNameList();
+
+        if (categoryNameList.size() != 2) {
+            throw new CategoryInvalidCountException();
+        }
+
+        List<Category> categoryList = new ArrayList<>();
+
+        categoryList = categoryRepository.findAllByNameIn(
+            categoryNameList,
+            Sort.unsorted()
         );
 
-        // 데이터베이스에 가게 저장
-        Store savedStore = storeRepository.save(store);
+        Store storeToSave = new Store(
+            foundOwner.getId(),
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt(),
+            categoryList.get(0),
+            categoryList.get(1)
+        );
 
-        return new CreateStoreResponseDto(
-            savedStore.getId(),
-            savedStore.getStoreName(),
-            savedStore.getStoreAddress(),
-            savedStore.getStoreTelephone(),
-            savedStore.getMinimumPurchase(),
-            savedStore.getOpensAt(),
-            savedStore.getClosesAt());
+        Store savedStore = storeRepository.save(storeToSave);
+
+        return new CreateStoreResponseDto(savedStore);
     }
 
-    // 가게 다건 조회
+    @Transactional(readOnly = true)
     @Override
-    public List<Store> findByStoreNameContaining(String storeName) {
-        List<Store> storeEntityList = storeRepository.findByStoreNameContaining(storeName); // %LIKE%
+    public List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName) {
 
-//        return storeEntityList.stream()
-//            .map(StoreResponseDto::new)
-//            .collect(Collectors.toList());
-        return storeEntityList;
+        List<Store> storeList = new ArrayList<>();
 
+        storeList = storeRepository.findByStoreNameContainingAndIsDeleted(
+            storeName,
+            0
+        );
+
+        List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
+
+        for (Store foundStore : storeList) {
+            StoreNameSearchResponseDto responseDto = new StoreNameSearchResponseDto(foundStore);
+
+            responseDtoList.add(responseDto);
+        }
+
+        return responseDtoList;
     }
 
-    // 가게 단건 조회
+    @Transactional(readOnly = true)
     @Override
-    public StoreResponseDto findByStoreId(Long storeId) {
-        return null;
+    public StoreResponseDto findStoreByStoreId(Long storeId) {
+
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
+
+        List<Menu> menuList = new ArrayList<>();
+
+        menuList = menuRepository.findAllByStoreIdAndIsDeleted(
+            foundStore.getId(),
+            0
+        );
+
+        List<MenuDto> menuDtoList = new ArrayList<>();
+
+        for (Menu foundMenu : menuList) {
+            MenuDto menuDto = new MenuDto(foundMenu);
+            menuDtoList.add(menuDto);
+        }
+
+        return new StoreResponseDto(
+            foundStore,
+            menuDtoList
+        );
     }
 
-    // 가게 수정
     @Override
-    public StoreResponseDto updateStore(String storeName, String storeAddress,
-        String storeTelephone, Integer minimumPurchase, LocalTime opensAt, LocalTime closesAt) {
-        return null;
+    public UpdateStoreResponseDto updateStore(
+        Long storeId,
+        UpdateStoreRequestDto requestDto
+    ) {
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
+
+        foundStore.update(
+            requestDto.getStoreName(),
+            requestDto.getStoreAddress(),
+            requestDto.getStoreTelephone(),
+            requestDto.getMinimumPurchase(),
+            requestDto.getOpensAt(),
+            requestDto.getClosesAt()
+        );
+
+        storeRepository.save(foundStore);
+
+        return new UpdateStoreResponseDto(foundStore);
     }
 
-    // 가게 폐업
     @Override
-    public void deleteStore(Long storeId) {
+    @Transactional
+    public void deleteStore(Long storeId, String token) {
 
+        /**
+         * 토큰으로 권한 인증을 받은 사장님과 경로를 통해 값을 받아서 그 상점의 사장님과 같은지 검증로직
+         */
+        String ownerEmail = jwtUtil.extractOwnerEmail(token);
+
+        Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
+            .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
+
+        Store foundStore = storeRepository.findById(storeId)
+            .orElseThrow(StoreNotFoundException::new);
+
+        boolean isIdMismatching = !(foundOwner.getId().equals(foundStore.getOwnerId()));
+
+        if (isIdMismatching) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        foundStore.markAsDeleted();
     }
-
 }
