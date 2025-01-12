@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.utils;
 
+import com.example.outsourcingproject.order.OrderState;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +31,22 @@ public class SlackSendMessage {
     @Value("${slack.channel.id}")
     String channelId;
 
-
     /**
-     * 예외 처리 및, sendMessage()를 감싼다.
-     * @param content
+     * 주문 생성 및 상태 변경 시 호출되는 메서드
+     * - 예외 처리 및 sendMessage()를 감싼다.
+     * @param storeName
+     * @param orderState
      */
-    public void callSlackSendMessageApi(String content) {
+    public void callSlackSendMessageApi(String storeName, OrderState orderState) {
+        String content = null;
         try{
+            switch (orderState){
+                case PENDING -> content = "[" + storeName + "] " + "가게에 주문이 전송되었습니다.";
+                case ACCEPTED -> content = "[" + storeName + "] " + "가게에서 주문을 수락했습니다.";
+                case CANCELED -> content = "[" + storeName + "] " + "가게의 요청으로 주문이 취소되었습니다.";
+                case DELIVERING -> content = "[" + storeName + "] " + "배달이 출발되었습니다.";
+                case DELIVERED -> content = "[" + storeName + "] " + "배달이 완료되었습니다.";
+            }
             sendMessage(content);
         } catch (Exception e) {
             // 슬랙 메시지 전송이 오류가 프로그램 실행에 영향가지 않도록 예외처리 throw를 하지 않고, log만 기록
