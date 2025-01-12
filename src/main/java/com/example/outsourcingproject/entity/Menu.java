@@ -53,6 +53,27 @@ public class Menu extends BaseEntity {
     )
     private Store store;
 
+    @Comment("첫 번째 메뉴 카테고리 식별자")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "menu_category_one_id"
+    )
+    private MenuCategory menuCategoryOne;
+
+    @Comment("두 번째 메뉴 카테고리 식별자")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "menu_category_two_id"
+    )
+    private MenuCategory menuCategoryTwo;
+
+    @Comment("세 번째 메뉴 카테고리 식별자")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+        name = "menu_category_three_id"
+    )
+    private MenuCategory menuCategoryThree;
+
     protected Menu() {
     }
 
@@ -60,12 +81,18 @@ public class Menu extends BaseEntity {
         String menuName,
         Integer menuPrice,
         String menuInfo,
-        Store store
+        Store store,
+        MenuCategory menuCategoryOne,
+        MenuCategory menuCategoryTwo,
+        MenuCategory menuCategoryThree
     ) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.menuInfo = menuInfo;
         this.store = store;
+        this.menuCategoryOne = menuCategoryOne;
+        this.menuCategoryTwo = menuCategoryTwo;
+        this.menuCategoryThree = menuCategoryThree;
     }
 
     public void update(
