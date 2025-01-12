@@ -17,6 +17,7 @@ import com.example.outsourcingproject.orderitem.dto.response.CreateOrderItemResp
 import com.example.outsourcingproject.orderitem.dto.response.OrderItemResponseDto;
 import com.example.outsourcingproject.orderitem.repository.OrderItemRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
+import com.example.outsourcingproject.utils.SlackSendMessage;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final SlackSendMessage slackSendMessage;
 
     @Transactional
     @Override
@@ -97,6 +99,11 @@ public class OrderItemServiceImpl implements OrderItemService {
         savedOrder.updateTotals(totalAmountSum, totalPriceSum);
 
         orderRepository.save(savedOrder);
+
+        // Slack 알림 api로 가게명과 주문 상태를 전송
+        String storeName = savedOrder.getStore().getStoreName();
+        OrderState orderState = savedOrder.getOrderState();
+        slackSendMessage.callSlackSendMessageApi(storeName, orderState);
 
         return new CreateOrderItemWrapper(
             responseDtoList,

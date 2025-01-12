@@ -10,6 +10,7 @@ import com.example.outsourcingproject.order.dto.response.OrderResponseDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
+import com.example.outsourcingproject.utils.SlackSendMessage;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final StoreRepository storeRepository;
+    private final SlackSendMessage slackSendMessage;
 
     @Transactional(readOnly = true)
     @Override
@@ -68,6 +70,10 @@ public class OrderServiceImpl implements OrderService {
         OrderState nextStatus = OrderState.of(requestDto.getOrderState());
 
         foundOrder.updateOrderStatus(nextStatus);
+
+        // Slack 알림 api로 가게명과 주문 상태를 전송
+        String storeName = foundOrder.getStore().getStoreName();
+        slackSendMessage.callSlackSendMessageApi(storeName, nextStatus);
 
         return new UpdateOrderResponseDto(foundOrder);
     }
