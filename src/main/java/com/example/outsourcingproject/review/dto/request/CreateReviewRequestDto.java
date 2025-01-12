@@ -6,4 +6,12 @@ import lombok.Getter;
 public class CreateReviewRequestDto {
     private String contents;
     private Integer rating;
+
+    public CreateReviewRequestDto() {
+    }
+
+    public CreateReviewRequestDto(String contents, int rating) {
+        this.contents = contents;
+        this.rating = rating;
+    }
 }

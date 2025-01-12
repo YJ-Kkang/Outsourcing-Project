@@ -14,14 +14,16 @@ public class CreateReviewResponseDto {
     private final LocalDateTime createdAt;
 
     public CreateReviewResponseDto(
-        Long customerId,
+        Long reviewId,
         String contents,
         Integer rating,
         LocalDateTime createdAt
     ) {
-        this.id = customerId;
+        this.id = reviewId;
         this.contents = contents;
         this.rating = rating;
         this.createdAt = createdAt;
     }
+
+
 }
