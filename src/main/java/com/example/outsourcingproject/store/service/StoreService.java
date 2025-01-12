@@ -3,6 +3,7 @@ package com.example.outsourcingproject.store.service;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreCategorySearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
@@ -16,6 +17,8 @@ public interface StoreService {
     );
 
     List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName);
+
+    List<StoreCategorySearchResponseDto> readAllStoresByStoreCategory(String storeCategoryName);
 
     StoreResponseDto findStoreByStoreId(Long storeId);
 

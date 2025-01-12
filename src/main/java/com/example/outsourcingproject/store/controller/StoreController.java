@@ -3,9 +3,11 @@ package com.example.outsourcingproject.store.controller;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreCategorySearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
+import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.store.service.StoreService;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreRepository storeRepository;
 
     @PostMapping
     public ResponseEntity<CreateStoreResponseDto> createStore(
@@ -46,14 +49,27 @@ public class StoreController {
     }
 
     @GetMapping
-    public ResponseEntity<List<StoreNameSearchResponseDto>> readAllStores(
+    public ResponseEntity<List<StoreNameSearchResponseDto>> readAllStoresByStoreName(
         @RequestParam String search
     ) {
         List<StoreNameSearchResponseDto> responseDtoList = new ArrayList<>();
 
         responseDtoList = storeService.readAllStoresByStoreName(search);
 
-        log.info("findAllStore:{}", responseDtoList);
+        log.info("findAllStoresByStoreName:{}", responseDtoList);
+
+        return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<StoreCategorySearchResponseDto>> readAllStoresByStoreCategory(
+        @RequestParam String search
+    ) {
+        List<StoreCategorySearchResponseDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList = storeService.readAllStoresByStoreCategory(search);
+
+        log.info("findAllStoresByStoreCategory: {}", responseDtoList);
 
         return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }

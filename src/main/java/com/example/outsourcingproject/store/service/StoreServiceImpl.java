@@ -17,6 +17,7 @@ import com.example.outsourcingproject.store.dto.MenuDto;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
+import com.example.outsourcingproject.store.dto.response.StoreCategorySearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
@@ -111,6 +112,25 @@ public class StoreServiceImpl implements StoreService {
 
             responseDtoList.add(responseDto);
         }
+
+        return responseDtoList;
+    }
+
+    public List<StoreCategorySearchResponseDto> readAllStoresByStoreCategory(
+        String storeCategoryName) {
+
+        List<Store> storeList = new ArrayList<>();
+
+        storeList = storeRepository.findByStoreCategoryOne_NameOrStoreCategoryTwo_Name(
+            storeCategoryName,
+            storeCategoryName
+        );
+
+        List<StoreCategorySearchResponseDto> responseDtoList = new ArrayList<>();
+
+        responseDtoList = storeList.stream()
+            .map(StoreCategorySearchResponseDto::new)
+            .toList();
 
         return responseDtoList;
     }
