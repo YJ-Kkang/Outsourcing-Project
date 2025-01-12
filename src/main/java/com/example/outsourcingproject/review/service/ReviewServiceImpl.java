@@ -6,7 +6,7 @@ import com.example.outsourcingproject.entity.Customer;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.Review;
 import com.example.outsourcingproject.entity.Store;
-import com.example.outsourcingproject.order.OrderStatus;
+import com.example.outsourcingproject.order.OrderState;
 import com.example.outsourcingproject.order.repository.OrderRepository;
 import com.example.outsourcingproject.review.dto.request.CreateReviewRequestDto;
 import com.example.outsourcingproject.review.dto.response.CreateReviewResponseDto;
@@ -48,8 +48,8 @@ public class ReviewServiceImpl {
 
         // 주문 상태가 배송 완료일 경우에만 리뷰를 쓸 수 있도록 예외처리
         boolean isNotDelivered = !findorder
-            .getOrderStatus()
-            .equals(OrderStatus.DELIVERED
+            .getOrderState()
+            .equals(OrderState.DELIVERED
             );
 
         if (isNotDelivered) {
