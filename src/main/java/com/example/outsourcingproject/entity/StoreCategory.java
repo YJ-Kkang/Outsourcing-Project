@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "categories")
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Category {
+public class StoreCategory {
 
     @Comment("카테고리 식별자")
     @Id
@@ -30,10 +30,10 @@ public class Category {
     )
     private String name;
 
-    protected Category() {
+    protected StoreCategory() {
     }
 
-    public Category(
+    public StoreCategory(
         String name
     ) {
         this.name = name;
