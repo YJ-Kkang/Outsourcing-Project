@@ -55,23 +55,17 @@ public class Menu extends BaseEntity {
 
     @Comment("첫 번째 메뉴 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "menu_category_one_id"
-    )
+    @JoinColumn(name = "menu_category_one_id")
     private MenuCategory menuCategoryOne;
 
     @Comment("두 번째 메뉴 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "menu_category_two_id"
-    )
+    @JoinColumn(name = "menu_category_two_id")
     private MenuCategory menuCategoryTwo;
 
     @Comment("세 번째 메뉴 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "menu_category_three_id"
-    )
+    @JoinColumn(name = "menu_category_three_id")
     private MenuCategory menuCategoryThree;
 
     protected Menu() {

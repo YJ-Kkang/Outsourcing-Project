@@ -33,13 +33,15 @@ public class Store extends BaseEntity {
     @Comment("가게 이름")
     @Column(
         name = "store_name",
-        nullable = false)
+        nullable = false
+    )
     private String storeName;
 
     @Comment("가게 전화번호")
     @Column(
         name = "store_telephone",
-        nullable = false)
+        nullable = false
+    )
     private String storeTelephone;
 
     @Comment("가게 주소")
@@ -48,7 +50,6 @@ public class Store extends BaseEntity {
         nullable = false
     )
     private String storeAddress;
-
 
     @Comment("주문 최소 금액")
     @Column(
@@ -73,22 +74,13 @@ public class Store extends BaseEntity {
 
     @Comment("첫 번째 가게 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "store_category_one_id"
-    )
+    @JoinColumn(name = "store_category_one_id")
     private StoreCategory storeCategoryOne;
 
     @Comment("두 번째 가게 카테고리 식별자")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "stor_category_two_id"
-    )
+    @JoinColumn(name = "store_category_two_id")
     private StoreCategory storeCategoryTwo;
-
-    @Column(
-        insertable = false, updatable = false
-    )
-    private final boolean is_deleted = Boolean.FALSE;
 
     protected Store() {
     }
@@ -130,5 +122,4 @@ public class Store extends BaseEntity {
         this.opensAt = opensAt;
         this.closesAt = closesAt;
     }
-
 }
