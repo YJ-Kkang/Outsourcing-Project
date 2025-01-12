@@ -1,7 +1,7 @@
 package com.example.outsourcingproject.store.dto.response;
 
-import com.example.outsourcingproject.entity.StoreCategory;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.entity.StoreCategory;
 import java.time.LocalTime;
 import lombok.Getter;
 

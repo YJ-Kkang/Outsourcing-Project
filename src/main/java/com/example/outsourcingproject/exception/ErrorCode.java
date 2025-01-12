@@ -32,7 +32,7 @@ public enum ErrorCode {
         "리뷰는 배달 완료 상태에서만 작성 가능합니다."),
     DUPLICATE_REVIEW(HttpStatus.CONFLICT, "ERR0020",
         "리뷰는 중복으로 작성할 수 없습니다.");
-  
+
     private final HttpStatus status;
     private final String code;
     private final String message;
