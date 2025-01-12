@@ -52,7 +52,7 @@ public class StoreServiceImpl implements StoreService {
         Owner foundOwner = ownerAuthRepository.findByEmail(ownerEmail)
             .orElseThrow(OwnerNotFoundException::new);
 
-        Long storeCount = storeRepository.countByOwnerId(foundOwner.getId());
+        Long storeCount = storeRepository.countByOwnerIdAndIsDeleted(foundOwner.getId(), 0);
 
         if (storeCount >= 3) {
             throw new StoreInvalidCountExcessException();
