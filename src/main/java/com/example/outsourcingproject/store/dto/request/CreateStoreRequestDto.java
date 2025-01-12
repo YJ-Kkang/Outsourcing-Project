@@ -13,7 +13,7 @@ public class CreateStoreRequestDto {
     private final Integer minimumPurchase;
     private final LocalTime opensAt;
     private final LocalTime closesAt;
-    private final List<String> categoryNameList;
+    private final List<String> storeCategoryNameList;
 
     public CreateStoreRequestDto(
         String storeName,
@@ -22,7 +22,7 @@ public class CreateStoreRequestDto {
         Integer minimumPurchase,
         LocalTime opensAt,
         LocalTime closesAt,
-        List<String> categoryNameList
+        List<String> storeCategoryNameList
     ) {
         this.storeName = storeName;
         this.storeAddress = storeAddress;
@@ -30,6 +30,6 @@ public class CreateStoreRequestDto {
         this.minimumPurchase = minimumPurchase;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
-        this.categoryNameList = categoryNameList;
+        this.storeCategoryNameList = storeCategoryNameList;
     }
 }
