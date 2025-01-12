@@ -56,6 +56,6 @@ public class MenuController {
     ) {
         menuService.deleteMenu(menuId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
