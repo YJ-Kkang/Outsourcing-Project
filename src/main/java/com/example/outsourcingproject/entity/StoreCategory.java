@@ -12,7 +12,7 @@ import org.hibernate.annotations.Comment;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-@Table(name = "categories")
+@Table(name = "store_categories")
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class StoreCategory {

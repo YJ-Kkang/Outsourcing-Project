@@ -43,16 +43,16 @@ public class MenuServiceImpl implements MenuService {
 
         menuCategoryNameList = requestDto.getMenuCategoryNameList();
 
-        if (menuCategoryNameList.size() != 3) {
-            throw new CategoryInvalidCountException();
-        }
-
         List<MenuCategory> menuCategoryList = new ArrayList<>();
 
         menuCategoryList = menuCategoryRepository.findAllByNameIn(
             menuCategoryNameList,
             Sort.unsorted()
         );
+
+        if (menuCategoryList.size() != 3) {
+            throw new CategoryInvalidCountException();
+        }
 
         Menu menuToSave = new Menu(
             requestDto.getMenuName(),
