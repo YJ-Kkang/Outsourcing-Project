@@ -22,7 +22,7 @@ public class CreateStoreRequestDto {
         Integer minimumPurchase,
         LocalTime opensAt,
         LocalTime closesAt,
-        List<String> categoryNames
+        List<String> categoryNameList
     ) {
         this.storeName = storeName;
         this.storeAddress = storeAddress;
@@ -30,6 +30,6 @@ public class CreateStoreRequestDto {
         this.minimumPurchase = minimumPurchase;
         this.opensAt = opensAt;
         this.closesAt = closesAt;
-        this.categoryNameList = categoryNames;
+        this.categoryNameList = categoryNameList;
     }
 }
