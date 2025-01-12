@@ -1,6 +1,7 @@
 package com.example.outsourcingproject.store.dto.response;
 
 
+import com.example.outsourcingproject.entity.Store;
 import java.time.LocalTime;
 import lombok.Getter;
 
@@ -15,21 +16,13 @@ public class UpdateStoreResponseDto {
     private final LocalTime opensAt;
     private final LocalTime closesAt;
 
-    public UpdateStoreResponseDto(
-        Long id,
-        String storeName,
-        String storeAddress,
-        String storeTelephone,
-        Integer minimumPurchase,
-        LocalTime opensAt,
-        LocalTime closesAt
-    ) {
-        this.id = id;
-        this.storeName = storeName;
-        this.storeAddress = storeAddress;
-        this.storeTelephone = storeTelephone;
-        this.minimumPurchase = minimumPurchase;
-        this.opensAt = opensAt;
-        this.closesAt = closesAt;
+    public UpdateStoreResponseDto(Store store) {
+        this.id = store.getId();
+        this.storeName = store.getStoreName();
+        this.storeAddress = store.getStoreAddress();
+        this.storeTelephone = store.getStoreTelephone();
+        this.minimumPurchase = store.getMinimumPurchase();
+        this.opensAt = store.getOpensAt();
+        this.closesAt = store.getClosesAt();
     }
 }

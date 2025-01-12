@@ -21,11 +21,13 @@ public interface CustomerAuthRepository extends JpaRepository<Customer, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Customer c SET c.isDeleted = :isDeleted WHERE c.email = :email")
-    void updateIsDeletedByEmail(@Param("email") String email, @Param("isDeleted") Integer isDeleted);
+    void updateIsDeletedByEmail(@Param("email") String email,
+        @Param("isDeleted") Integer isDeleted);
 
     // Email을 기준으로 deletedAt 값을 업데이트
     @Modifying
     @Transactional
     @Query("UPDATE Customer c SET c.deletedAt = :deletedAt WHERE c.email = :email")
-    void updateDeletedAtByEmail(@Param("email") String email, @Param("deletedAt") LocalDateTime deletedAt);
+    void updateDeletedAtByEmail(@Param("email") String email,
+        @Param("deletedAt") LocalDateTime deletedAt);
 }

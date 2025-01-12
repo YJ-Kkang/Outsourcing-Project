@@ -1,7 +1,10 @@
 package com.example.outsourcingproject.menu.service;
 
+import com.example.outsourcingproject.category.repository.MenuCategoryRepository;
 import com.example.outsourcingproject.entity.Menu;
+import com.example.outsourcingproject.entity.MenuCategory;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.badrequest.CategoryInvalidCountException;
 import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.dto.request.CreateMenuRequestDto;
@@ -10,7 +13,10 @@ import com.example.outsourcingproject.menu.dto.response.CreateMenuResponseDto;
 import com.example.outsourcingproject.menu.dto.response.UpdateMenuResponseDto;
 import com.example.outsourcingproject.menu.repository.MenuRepository;
 import com.example.outsourcingproject.store.repository.StoreRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +28,7 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final MenuCategoryRepository menuCategoryRepository;
 
     @Transactional
     @Override
@@ -32,21 +39,34 @@ public class MenuServiceImpl implements MenuService {
         Store foundStore = storeRepository.findById(storeId)
             .orElseThrow(StoreNotFoundException::new);
 
+        List<String> menuCategoryNameList = new ArrayList<>();
+
+        menuCategoryNameList = requestDto.getMenuCategoryNameList();
+
+        List<MenuCategory> menuCategoryList = new ArrayList<>();
+
+        menuCategoryList = menuCategoryRepository.findAllByNameIn(
+            menuCategoryNameList,
+            Sort.unsorted()
+        );
+
+        if (menuCategoryList.size() != 3) {
+            throw new CategoryInvalidCountException();
+        }
+
         Menu menuToSave = new Menu(
             requestDto.getMenuName(),
             requestDto.getMenuPrice(),
             requestDto.getMenuInfo(),
-            foundStore
+            foundStore,
+            menuCategoryList.get(0),
+            menuCategoryList.get(1),
+            menuCategoryList.get(2)
         );
 
         Menu savedMenu = menuRepository.save(menuToSave);
 
-        return new CreateMenuResponseDto(
-            savedMenu.getId(),
-            savedMenu.getMenuName(),
-            savedMenu.getMenuPrice(),
-            savedMenu.getMenuInfo()
-        );
+        return new CreateMenuResponseDto(savedMenu);
     }
 
     @Transactional

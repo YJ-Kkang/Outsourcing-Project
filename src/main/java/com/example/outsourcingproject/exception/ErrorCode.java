@@ -2,6 +2,7 @@ package com.example.outsourcingproject.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException.Forbidden;
 
 @Getter
 public enum ErrorCode {
@@ -23,9 +24,15 @@ public enum ErrorCode {
         "수락 상태에서 이 작업을 수행할 수 없습니다. 주문은 수락 후 배달 중 상태로만 변경 가능합니다."),
     INVALID_CANCELED_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0015", "취소 처리된 주문은 상태를 변경할 수 없습니다."),
     INVALID_DELIVERING_STATE_TRANSITION(HttpStatus.CONFLICT, "ERR0016",
-        "배달 중 상태에서 이 작업을 수행할 수 없습니다. 주문은 배달 완료 상태로만 변경 가능합니다.");
-
-
+        "배달 중 상태에서 이 작업을 수행할 수 없습니다. 주문은 배달 완료 상태로만 변경 가능합니다."),
+    BAD_REQUEST_STORE_LIMIT(HttpStatus.BAD_REQUEST, "ERR0017", "한 계정으로 가게는 최대 3개까지만 열 수 있습니다."),
+    BAD_REQUEST_CATEGORY_INVALID_BOUND(HttpStatus.BAD_REQUEST, "ERR0018",
+        "카테고리는 가게 생성 시 2개, 메뉴 생성 시 3개가 입력되어야 합니다."),
+    FORBIDDEN_ORDER(HttpStatus.FORBIDDEN, "ERR0019",
+        "리뷰는 배달 완료 상태에서만 작성 가능합니다."),
+    DUPLICATE_REVIEW(HttpStatus.CONFLICT, "ERR0020",
+        "리뷰는 중복으로 작성할 수 없습니다.");
+  
     private final HttpStatus status;
     private final String code;
     private final String message;
