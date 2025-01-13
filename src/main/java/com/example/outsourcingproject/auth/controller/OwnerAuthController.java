@@ -6,7 +6,6 @@ import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpOwnerResponseDto;
 import com.example.outsourcingproject.auth.service.OwnerAuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ public class OwnerAuthController {
     // 사장님 회원가입
     @PostMapping("/auth/sign-up/owners")
     public ResponseEntity<SignUpOwnerResponseDto> signUpOwner(
-        @RequestBody @Valid SignUpOwnerRequestDto requestDto
+        @RequestBody SignUpOwnerRequestDto requestDto
     ) {
         SignUpOwnerResponseDto responseDto = ownerAuthService.signUp(requestDto);
 
@@ -36,7 +35,7 @@ public class OwnerAuthController {
     // 사장님 로그인
     @PostMapping("/auth/sign-in/owners")
     public ResponseEntity<SignInOwnerResponseDto> signInOwner(
-        @RequestBody @Valid SignInOwnerRequestDto requestDto
+        @RequestBody SignInOwnerRequestDto requestDto
     ) {
         SignInOwnerResponseDto signInOwnerResponseDto = ownerAuthService.signIn(requestDto);
 

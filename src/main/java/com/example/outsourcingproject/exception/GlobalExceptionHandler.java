@@ -3,14 +3,11 @@ package com.example.outsourcingproject.exception;
 import com.example.outsourcingproject.exception.badrequest.BadRequestException;
 import com.example.outsourcingproject.exception.invalidtransition.InvalidTransitionException;
 import com.example.outsourcingproject.exception.notfound.NotFoundException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -70,25 +67,5 @@ public class GlobalExceptionHandler {
 
         log.info("에러 발생 >>> 코드: {}, 메시지: {}", errorCode, errorMessage);
         return new ResponseEntity<>(response, status);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        List<String> errors = new ArrayList<>();
-
-        // 검증 실패한 필드들을 에러 리스트에 추가
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String errorMessage = error.getDefaultMessage();
-            errors.add(errorMessage);
-        });
-
-        response.put("errorCode", "VALIDATION_ERROR");
-        response.put("errorMessages", "형식에 맞지 않는 입력값입니다.");
-
-        // 로깅
-        log.info("검증 실패 >>> 오류 메시지: {}", errors);
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,13 +1,11 @@
 package com.example.outsourcingproject.auth.controller;
 
-import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +27,7 @@ public class CustomerAuthController {
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
     public ResponseEntity<SignUpCustomerResponseDto> signUpCustomer(
-        @RequestBody @Valid SignUpCustomerRequestDto requestDto
+        @RequestBody SignUpCustomerRequestDto requestDto
     ) {
         SignUpCustomerResponseDto responseDto = customerAuthService.signUp(requestDto);
 
@@ -39,7 +37,7 @@ public class CustomerAuthController {
     // 손님 로그인
     @PostMapping("/auth/sign-in/customers")
     public ResponseEntity<SignInCustomerResponseDto> signInCustomer(
-        @RequestBody @Valid SignInCustomerRequestDto requestDto
+        @RequestBody SignInCustomerRequestDto requestDto
     ) {
         SignInCustomerResponseDto responseDto = customerAuthService.signIn(requestDto);
 
@@ -47,7 +45,6 @@ public class CustomerAuthController {
     }
 
     // 손님 탈퇴
-    @AuthCheck("CUSTOMER")
     @DeleteMapping("/customers")
     public ResponseEntity<Void> deleteCustomer(
         @RequestBody String password,
