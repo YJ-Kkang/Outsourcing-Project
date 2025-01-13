@@ -5,6 +5,7 @@ import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.MenuCategory;
 import com.example.outsourcingproject.entity.Store;
 import com.example.outsourcingproject.exception.badrequest.CategoryInvalidCountException;
+import com.example.outsourcingproject.exception.badrequest.StoreMismatchException;
 import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
 import com.example.outsourcingproject.menu.dto.request.CreateMenuRequestDto;
@@ -17,10 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -85,8 +84,8 @@ public class MenuServiceImpl implements MenuService {
         boolean isMenuFromDifferentStore = !foundMenu.getStore().getId().equals(foundStore.getId());
 
         if (isMenuFromDifferentStore) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        } // todo 수정하려는 메뉴가 속한 가게의 id와 사장님이 입력한 storeId가 다르면 예외 처리
+            throw new StoreMismatchException();
+        }
 
         foundMenu.update(
             requestDto.getMenuName(),

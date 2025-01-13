@@ -99,7 +99,6 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     @Override
     public List<StoreNameSearchResponseDto> readAllStoresByStoreName(String storeName) {
-
         List<Store> storeList = new ArrayList<>();
 
         storeList = storeRepository.findByStoreNameContainingAndIsDeleted(
@@ -121,8 +120,8 @@ public class StoreServiceImpl implements StoreService {
     @Transactional
     @Override
     public List<StoreCategorySearchResponseDto> readAllStoresByStoreCategory(
-        String storeCategoryName) {
-
+        String storeCategoryName
+    ) {
         List<Store> storeList = new ArrayList<>();
 
         storeList = storeRepository.findByStoreCategoryOne_NameOrStoreCategoryTwo_NameAndIsDeleted(
@@ -166,7 +165,6 @@ public class StoreServiceImpl implements StoreService {
     @Transactional(readOnly = true)
     @Override
     public StoreResponseDto findStoreByStoreId(Long storeId) {
-
         Store foundStore = storeRepository.findById(storeId)
             .orElseThrow(StoreNotFoundException::new);
 
@@ -215,7 +213,6 @@ public class StoreServiceImpl implements StoreService {
     @Override
     @Transactional
     public void deleteStore(Long storeId, String token) {
-
         /**
          * 토큰으로 권한 인증을 받은 사장님과 경로를 통해 값을 받아서 그 상점의 사장님과 같은지 검증로직
          */
