@@ -6,6 +6,8 @@ import com.example.outsourcingproject.entity.Menu;
 import com.example.outsourcingproject.entity.Order;
 import com.example.outsourcingproject.entity.OrderItem;
 import com.example.outsourcingproject.entity.Store;
+import com.example.outsourcingproject.exception.badrequest.BelowMinimumPurchaseException;
+import com.example.outsourcingproject.exception.badrequest.InvalidOrderTimeException;
 import com.example.outsourcingproject.exception.notfound.MenuNotFoundException;
 import com.example.outsourcingproject.exception.notfound.OrderNotFoundException;
 import com.example.outsourcingproject.exception.notfound.StoreNotFoundException;
@@ -22,10 +24,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +43,6 @@ public class OrderItemServiceImpl implements OrderItemService {
         Long storeId,
         List<CreateOrderItemRequestDto> requestDtoList
     ) {
-
         Store foundStore = storeRepository.findById(storeId)
             .orElseThrow(StoreNotFoundException::new);
 
@@ -52,10 +51,8 @@ public class OrderItemServiceImpl implements OrderItemService {
         boolean isAfterClosesAt = timeToOrder.isAfter(foundStore.getClosesAt());
 
         if (isBeforeOpensAt || isAfterClosesAt) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST
-            );
-        } // todo 가게 오픈 시간 전이나 종료 시간 후 주문 시 예외 처리
+            throw new InvalidOrderTimeException();
+        }
 
         Order orderToSave = new Order(
             OrderState.PENDING,
@@ -68,19 +65,20 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         responseDtoList = requestDtoList.stream()
             .map(requestDto -> {
-                Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
-                    .orElseThrow(MenuNotFoundException::new);
+                    Menu foundMenu = menuRepository.findById(requestDto.getMenuId())
+                        .orElseThrow(MenuNotFoundException::new);
 
-                OrderItem orderItemToSave = new OrderItem(
-                    savedOrder,
-                    foundMenu,
-                    requestDto.getEachAmount()
-                );
+                    OrderItem orderItemToSave = new OrderItem(
+                        savedOrder,
+                        foundMenu,
+                        requestDto.getEachAmount()
+                    );
 
-                OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
+                    OrderItem savedOrderItem = orderItemRepository.save(orderItemToSave);
 
-                return new CreateOrderItemResponseDto(savedOrderItem);
-            }).toList();
+                    return new CreateOrderItemResponseDto(savedOrderItem);
+                }
+            ).toList();
 
         Integer totalPriceSum = responseDtoList.stream()
             .mapToInt(CreateOrderItemResponseDto::getTotalPrice)
@@ -89,8 +87,8 @@ public class OrderItemServiceImpl implements OrderItemService {
         boolean isBelowMinimumPurchase = totalPriceSum < foundStore.getMinimumPurchase();
 
         if (isBelowMinimumPurchase) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        } // todo 최소 주문 금액보다 적으면 예외 처리
+            throw new BelowMinimumPurchaseException();
+        }
 
         Integer totalAmountSum = responseDtoList.stream()
             .mapToInt(CreateOrderItemResponseDto::getEachAmount)
@@ -102,7 +100,9 @@ public class OrderItemServiceImpl implements OrderItemService {
 
         // Slack 알림 api로 가게명과 주문 상태를 전송
         String storeName = savedOrder.getStore().getStoreName();
+
         OrderState orderState = savedOrder.getOrderState();
+
         slackSendMessage.callSlackSendMessageApi(storeName, orderState);
 
         return new CreateOrderItemWrapper(

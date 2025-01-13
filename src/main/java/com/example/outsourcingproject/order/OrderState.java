@@ -1,8 +1,7 @@
 package com.example.outsourcingproject.order;
 
+import com.example.outsourcingproject.exception.badrequest.InvalidOrderStateException;
 import java.util.Arrays;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public enum OrderState {
     PENDING, // 주문 생성 시, 즉 수락 대기 상태
@@ -19,10 +18,6 @@ public enum OrderState {
                     .name()
                     .equalsIgnoreCase(orderState))
             .findFirst()
-            .orElseThrow(
-                () -> new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST
-                )
-            ); // todo 상태 값이 없을 시 예외 처리
+            .orElseThrow(InvalidOrderStateException::new);
     }
 }
