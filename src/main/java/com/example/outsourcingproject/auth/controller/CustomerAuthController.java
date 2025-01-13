@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.auth.dto.request.SignInCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpCustomerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDto;
@@ -46,6 +47,7 @@ public class CustomerAuthController {
     }
 
     // 손님 탈퇴
+    @AuthCheck("CUSTOMER")
     @DeleteMapping("/customers")
     public ResponseEntity<Void> deleteCustomer(
         @RequestBody String password,

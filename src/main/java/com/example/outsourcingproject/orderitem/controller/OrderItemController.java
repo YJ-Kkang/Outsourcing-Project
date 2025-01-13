@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.orderitem.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.common.CreateOrderItemWrapper;
 import com.example.outsourcingproject.common.ReadOrderItemWrapper;
 import com.example.outsourcingproject.orderitem.dto.request.CreateOrderItemRequestDto;
@@ -22,6 +23,7 @@ public class OrderItemController {
 
     private final OrderItemServiceImpl orderItemService;
 
+    @AuthCheck("CUSTOMER")
     @PostMapping("/{storeId}")
     public ResponseEntity<CreateOrderItemWrapper> createOrderItem(
         @PathVariable("storeId") Long storeId,
@@ -35,6 +37,7 @@ public class OrderItemController {
         return new ResponseEntity<>(responseDtoWrapper, HttpStatus.CREATED);
     }
 
+    @AuthCheck("OWNER")
     @GetMapping("/each/{orderId}")
     public ResponseEntity<ReadOrderItemWrapper> readAllOrderItems(
         @PathVariable("orderId") Long orderId

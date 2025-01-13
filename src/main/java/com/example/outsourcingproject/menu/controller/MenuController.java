@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.menu.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.menu.dto.request.CreateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.request.UpdateMenuRequestDto;
 import com.example.outsourcingproject.menu.dto.response.CreateMenuResponseDto;
@@ -23,6 +24,7 @@ public class MenuController {
 
     private final MenuService menuService;
 
+    @AuthCheck("OWNER")
     @PostMapping
     public ResponseEntity<CreateMenuResponseDto> createMenu(
         @PathVariable("storeId") Long storeId,
@@ -36,6 +38,7 @@ public class MenuController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
+    @AuthCheck("OWNER")
     @PatchMapping("/{menuId}")
     public ResponseEntity<UpdateMenuResponseDto> updateMenu(
         @PathVariable("storeId") Long storeId,
@@ -50,6 +53,7 @@ public class MenuController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @AuthCheck("OWNER")
     @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(
         @PathVariable("menuId") Long menuId
