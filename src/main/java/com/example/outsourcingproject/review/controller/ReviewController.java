@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.review.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.review.dto.request.CreateReviewRequestDto;
 import com.example.outsourcingproject.review.dto.response.CreateReviewResponseDto;
 import com.example.outsourcingproject.review.dto.response.FindReviewResponseDto;
@@ -25,6 +26,7 @@ public class ReviewController {
         this.reviewServiceImpl = reviewServiceImpl;
     }
 
+    @AuthCheck("CUSTOMER")
     @PostMapping("/orders/{orderId}/reviews")
     public ResponseEntity<CreateReviewResponseDto> createReview(
         @PathVariable("orderId") Long orderId,

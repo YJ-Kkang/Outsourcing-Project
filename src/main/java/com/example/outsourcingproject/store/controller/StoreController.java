@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.store.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.store.dto.request.CreateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.request.UpdateStoreRequestDto;
 import com.example.outsourcingproject.store.dto.response.CreateStoreResponseDto;
@@ -7,7 +8,6 @@ import com.example.outsourcingproject.store.dto.response.StoreCategorySearchResp
 import com.example.outsourcingproject.store.dto.response.StoreNameSearchResponseDto;
 import com.example.outsourcingproject.store.dto.response.StoreResponseDto;
 import com.example.outsourcingproject.store.dto.response.UpdateStoreResponseDto;
-import com.example.outsourcingproject.store.repository.StoreRepository;
 import com.example.outsourcingproject.store.service.StoreService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ public class StoreController {
 
     private final StoreService storeService;
 
+    @AuthCheck("OWNER")
     @PostMapping
     public ResponseEntity<CreateStoreResponseDto> createStore(
         @RequestBody CreateStoreRequestDto requestDto,
@@ -86,6 +87,7 @@ public class StoreController {
     }
 
     // 가게 수정
+    @AuthCheck("OWNER")
     @PatchMapping("/{storeId}")
     public ResponseEntity<UpdateStoreResponseDto> updateStore(
         @PathVariable("storeId") Long storeId,
@@ -97,6 +99,7 @@ public class StoreController {
     }
 
     // 가게 폐업
+    @AuthCheck("OWNER")
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(
         @PathVariable Long storeId,

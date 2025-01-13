@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.order.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.order.dto.request.UpdateOrderRequestDto;
 import com.example.outsourcingproject.order.dto.response.OrderResponseDto;
 import com.example.outsourcingproject.order.dto.response.UpdateOrderResponseDto;
@@ -23,7 +24,7 @@ public class OrderController {
 
     private final OrderServiceImpl orderService;
 
-    // todo : 사장님 권한 추가해야 함
+    @AuthCheck("OWNER")
     @GetMapping
     public ResponseEntity<List<OrderResponseDto>> readAllOrdersAllStores() {
 
@@ -34,7 +35,7 @@ public class OrderController {
         return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
-    // todo : 사장님 권한 추가해야 함
+    @AuthCheck("OWNER")
     @GetMapping("/{storeId}")
     public ResponseEntity<List<OrderResponseDto>> readAllOrdersByStoreId(
         @PathVariable("storeId") Long storeId
@@ -46,6 +47,7 @@ public class OrderController {
         return new ResponseEntity<>(responseDtoList, HttpStatus.OK);
     }
 
+    @AuthCheck("OWNER")
     @PatchMapping
     public ResponseEntity<UpdateOrderResponseDto> updateOrderStatus(
         @RequestBody UpdateOrderRequestDto requestDto

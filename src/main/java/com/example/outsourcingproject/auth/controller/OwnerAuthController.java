@@ -1,5 +1,6 @@
 package com.example.outsourcingproject.auth.controller;
 
+import com.example.outsourcingproject.aspect.AuthCheck;
 import com.example.outsourcingproject.auth.dto.request.SignInOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.request.SignUpOwnerRequestDto;
 import com.example.outsourcingproject.auth.dto.response.SignInOwnerResponseDto;
@@ -44,6 +45,7 @@ public class OwnerAuthController {
     }
 
     // 사장님 탈퇴
+    @AuthCheck("OWNER")
     @DeleteMapping("/owners")
     public ResponseEntity<Void> deleteOwner(
         @RequestBody String password,
