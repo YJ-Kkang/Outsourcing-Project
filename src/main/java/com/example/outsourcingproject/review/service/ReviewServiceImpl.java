@@ -150,7 +150,7 @@ public class ReviewServiceImpl {
             reviewList.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
         } else if ("oldest".equals(sort)) {
             // 오래된순 정렬
-            reviewList.sort(Comparator.comparing(BaseEntity::getCreatedAt));
+            reviewList.sort(Comparator.comparing(Review::getCreatedAt));
         }
 
         // Review 엔티티를 DTO 로 변환

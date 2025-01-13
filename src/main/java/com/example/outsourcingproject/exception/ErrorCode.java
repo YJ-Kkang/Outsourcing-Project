@@ -2,7 +2,6 @@ package com.example.outsourcingproject.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException.Forbidden;
 
 @Getter
 public enum ErrorCode {
@@ -31,7 +30,11 @@ public enum ErrorCode {
     FORBIDDEN_ORDER(HttpStatus.FORBIDDEN, "ERR0019",
         "리뷰는 배달 완료 상태에서만 작성 가능합니다."),
     DUPLICATE_REVIEW(HttpStatus.CONFLICT, "ERR0020",
-        "리뷰는 중복으로 작성할 수 없습니다.");
+        "리뷰는 중복으로 작성할 수 없습니다."),
+    BAD_REQUEST_INVALID_ORDER_TIME(HttpStatus.BAD_REQUEST, "ERR0021", "영업 시간에 주문해 주세요."),
+    BAD_REQUEST_BELOW_MINIMUM_PURCHASE(HttpStatus.BAD_REQUEST, "ERROR22", "주문 최소 금액 이상 주문해 주세요"),
+    BAD_REQUEST_INVALID_ORDER_STATE(HttpStatus.BAD_REQUEST, "ERROR23", "입력된 주문 상태가 유효하지 않습니다. 정확한 상태를 입력해 주세요."),
+    BAD_REQUEST_STORE_MISMATCH(HttpStatus.BAD_REQUEST, "ERROR24", "해당 메뉴는 다른 가게에 속해 있습니다. 올바른 가게의 메뉴를 수정해 주세요.");
 
     private final HttpStatus status;
     private final String code;
