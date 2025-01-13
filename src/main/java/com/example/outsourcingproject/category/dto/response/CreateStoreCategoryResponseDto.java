@@ -1,18 +1,23 @@
 package com.example.outsourcingproject.category.dto.response;
 
-import com.example.outsourcingproject.entity.StoreCategory;
-import lombok.Getter;
 
-@Getter
 public class CreateStoreCategoryResponseDto {
-
-    private final Long id;
-    private final String name;
-
-    public CreateStoreCategoryResponseDto(
-        StoreCategory storeCategory
-    ) {
-        this.id = storeCategory.getId();
-        this.name = storeCategory.getName();
+    private Long id;
+    private String name;
+    // 기본 생성자 추가
+    public CreateStoreCategoryResponseDto() {
+    }
+    // 생성자
+    public CreateStoreCategoryResponseDto(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    // id에 대한 getter
+    public Long getId() {
+        return id;
+    }
+    // name에 대한 getter
+    public String getName() {
+        return name;
     }
 }
