@@ -6,6 +6,7 @@ import com.example.outsourcingproject.auth.dto.response.SignInCustomerResponseDt
 import com.example.outsourcingproject.auth.dto.response.SignUpCustomerResponseDto;
 import com.example.outsourcingproject.auth.service.CustomerAuthServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class CustomerAuthController {
     // 손님 회원가입
     @PostMapping("/auth/sign-up/customers")
     public ResponseEntity<SignUpCustomerResponseDto> signUpCustomer(
-        @RequestBody SignUpCustomerRequestDto requestDto
+        @RequestBody @Valid SignUpCustomerRequestDto requestDto
     ) {
         SignUpCustomerResponseDto responseDto = customerAuthService.signUp(requestDto);
 
@@ -37,7 +38,7 @@ public class CustomerAuthController {
     // 손님 로그인
     @PostMapping("/auth/sign-in/customers")
     public ResponseEntity<SignInCustomerResponseDto> signInCustomer(
-        @RequestBody SignInCustomerRequestDto requestDto
+        @RequestBody @Valid SignInCustomerRequestDto requestDto
     ) {
         SignInCustomerResponseDto responseDto = customerAuthService.signIn(requestDto);
 
